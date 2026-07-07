@@ -1,0 +1,23 @@
+{
+  "name": "com.likeon.narrative",
+  "version": "0.1.0",
+  "displayName": "Sigil - Narrative (Dialogue / Quest / Save)",
+  "description": "Single-player narrative core for Unity: branching dialogue, a state-machine quest system, and save/load. Reuses the Sigil GameplayTag system (com.likeon.gas). A C# reimplementation of the design of Narrative Pro / Narrative Arsenal (design by Narrative Tools), rewritten for Unity. Combat (GAS), networking, AI, character creator and graph editors are intentionally out of scope.",
+  "unity": "6000.4",
+  "keywords": [
+    "narrative",
+    "dialogue",
+    "quest",
+    "story",
+    "save",
+    "rpg",
+    "gameplay tags"
+  ],
+  "author": {
+    "name": "Likeon"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "com.likeon.gas": "0.7.2"
+  }
+}

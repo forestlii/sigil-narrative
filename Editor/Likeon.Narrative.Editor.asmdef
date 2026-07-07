@@ -1,0 +1,19 @@
+{
+  "name": "Likeon.Narrative.Editor",
+  "rootNamespace": "Likeon.Narrative.Editor",
+  "references": [
+    "Likeon.Narrative.Runtime",
+    "Likeon.GAS.Runtime"
+  ],
+  "includePlatforms": [
+    "Editor"
+  ],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "autoReferenced": false,
+  "defineConstraints": [],
+  "versionDefines": [],
+  "noEngineReferences": false
+}
