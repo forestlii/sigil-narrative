@@ -14,3 +14,4 @@
   `Likeon.Narrative.Runtime` / `.Editor` / `.Tests.EditMode` 程序集定义。
 - `Core`：`DataTaskDefinition`（轻量 `名_参数` 任务标记）与 `MasterTaskList`
   （已完成 data-task 的持久记录；任务与对话的耦合点）。
+- 文档：双语 README、MIT `LICENSE`、以及 `Documentation~/` 下的双语 devlog。

@@ -1,4 +1,4 @@
-// (c) 2026 Likeon — Sigil Narrative. C# rewrite of Narrative Pro design (Narrative Tools). License: see LICENSE.md (draft).
+// Copyright (c) 2026 Likeon. Licensed under the MIT License.
 // 轻量“数据任务”定义。对应 UE 的 UNarrativeDataTask（继承 UDataAsset），这里落成 ScriptableObject。
 // 一个数据任务 = 任务名(TaskName) + 参数(Argument)，如 "KillNPC" + "King"。用 MakeTaskString 拍成一个原始串，
 // 供任务状态机推进 / 存档记录 / 对话条件查询（"是否杀过 King" 之类）。见 [[MasterTaskList]]。

@@ -1,4 +1,4 @@
-// (c) 2026 Likeon — Sigil Narrative. C# rewrite of Narrative Pro design (Narrative Tools). License: see LICENSE.md (draft).
+// Copyright (c) 2026 Likeon. Licensed under the MIT License.
 // 玩家“做过什么”的持久记录。对应 UE UTalesComponent 里的 MasterTaskList（TMap<FString,int32>）。
 // 记录每个 data-task 原始串被完成的次数，是任务系统与对话系统的耦合点，也是存档核心之一。
 // 纯 C#（不依赖 UnityEngine），便于 EditMode 单测。见 [[DataTaskDefinition]]。
