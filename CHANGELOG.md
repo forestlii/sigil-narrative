@@ -42,4 +42,12 @@ While the public API is unstable it stays in the `0.y.z` range and may break wit
   `QuestStarted` / `QuestForgotten` / `QuestRestarted` / `QuestNewState` / `QuestBranchCompleted` /
   `QuestTaskProgressChanged` / `QuestTaskCompleted` / `QuestSucceeded` / `QuestFailed`.
   `Quest.Deinitialize` ends active tasks (unsubscribing host hooks) on forget/restart.
+- `Save` (narrative state, single-player path only): `NarrativeSaveData` DTO (JSON via `JsonUtility`)
+  capturing quest progress (current state, per-branch task progress, reached states) plus the master
+  task list; `QuestAsset.QuestId` as the stable save key. `NarrativeComponent.CaptureNarrativeState` /
+  `RestoreNarrativeState(data, knownQuests)` mirror UE `PrepareForSave` / `PerformLoad` — restore
+  rebuilds each quest at its saved state, refills task progress via the non-broadcasting
+  `RestoreProgress`, and stays silent (`IsLoading`, no `OnQuest*` events fire). `NarrativeSaveManager`
+  does JSON + file I/O behind an injectable `IFileSystem` (default `DiskFileSystem`). Note:
+  `NarrativeEvent.RefireOnLoad` has no consumer yet — quest states carry no events in this port.
 - Docs: bilingual README, MIT `LICENSE`, and a bilingual usage guide (`Documentation~/Usage.md`).

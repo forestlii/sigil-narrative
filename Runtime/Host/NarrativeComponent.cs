@@ -24,6 +24,9 @@ namespace Likeon.Narrative
         // 每个 quest 实例的事件解绑器，Forget/Restart 时用来断开桥接，避免悬空订阅。
         private readonly Dictionary<Quest, Action> _questUnsubscribe = new Dictionary<Quest, Action>();
 
+        // 读档期间为 true：此时不向外广播任何宿主级 OnQuest* 事件（对应 UE 的 bIsLoading）。
+        private bool _isLoading;
+
         /// <inheritdoc/>
         public MasterTaskList MasterTasks => _masterTasks;
 
@@ -259,15 +262,16 @@ namespace Likeon.Narrative
         }
 
         // 把一个 quest 实例的事件桥接到宿主 OnQuest* 事件，并登记对应的解绑动作。
+        // 读档期间（_isLoading）一律不广播，避免读档重建时把一堆 Started/NewState 假事件推给 UI。
         private void WireQuest(Quest quest)
         {
-            Action<Quest> started = q => QuestStarted?.Invoke(q);
-            Action<Quest, QuestState> newState = (q, s) => QuestNewState?.Invoke(q, s);
-            Action<Quest, QuestBranch, QuestTask, int, int> progress = (q, b, t, o, n) => QuestTaskProgressChanged?.Invoke(q, b, t, o, n);
-            Action<Quest, QuestBranch, QuestTask> taskCompleted = (q, b, t) => QuestTaskCompleted?.Invoke(q, b, t);
-            Action<Quest, QuestBranch> branchCompleted = (q, b) => QuestBranchCompleted?.Invoke(q, b);
-            Action<Quest> succeeded = q => QuestSucceeded?.Invoke(q);
-            Action<Quest> failed = q => QuestFailed?.Invoke(q);
+            Action<Quest> started = q => { if (!_isLoading) QuestStarted?.Invoke(q); };
+            Action<Quest, QuestState> newState = (q, s) => { if (!_isLoading) QuestNewState?.Invoke(q, s); };
+            Action<Quest, QuestBranch, QuestTask, int, int> progress = (q, b, t, o, n) => { if (!_isLoading) QuestTaskProgressChanged?.Invoke(q, b, t, o, n); };
+            Action<Quest, QuestBranch, QuestTask> taskCompleted = (q, b, t) => { if (!_isLoading) QuestTaskCompleted?.Invoke(q, b, t); };
+            Action<Quest, QuestBranch> branchCompleted = (q, b) => { if (!_isLoading) QuestBranchCompleted?.Invoke(q, b); };
+            Action<Quest> succeeded = q => { if (!_isLoading) QuestSucceeded?.Invoke(q); };
+            Action<Quest> failed = q => { if (!_isLoading) QuestFailed?.Invoke(q); };
 
             quest.Started += started;
             quest.NewState += newState;
@@ -295,6 +299,193 @@ namespace Likeon.Narrative
             {
                 unsubscribe();
                 _questUnsubscribe.Remove(quest);
+            }
+        }
+
+        // ==================== 存档 / 读档（叙事状态）====================
+        //
+        // 只覆盖“路径一：叙事状态” = 任务进度 + 完成过的 data-task。world-actor 通用存档是后续里程碑。
+        // 对应 UE UTalesComponent::PrepareForSave / PerformLoad。
+
+        /// <summary>是否正在读档（此间不广播 OnQuest* 事件）。对应 UE bIsLoading。</summary>
+        public bool IsLoading => _isLoading;
+
+        /// <summary>
+        /// 把当前叙事状态快照成一份 <see cref="NarrativeSaveData"/>：每个任务的所处状态、各分支任务进度、
+        /// 到达过的状态，以及完成过的 data-task 表。对应 UE <c>PrepareForSave</c>。
+        /// </summary>
+        public NarrativeSaveData CaptureNarrativeState()
+        {
+            var data = new NarrativeSaveData();
+
+            foreach (var entry in _masterTasks.Entries)
+            {
+                data.masterTasks.Add(new SavedMasterTask(entry.Key, entry.Value));
+            }
+
+            foreach (var quest in _questList)
+            {
+                if (quest == null || quest.SourceAsset == null || quest.CurrentState == null)
+                {
+                    continue;
+                }
+
+                var saved = new SavedQuest
+                {
+                    questId = quest.SourceAsset.QuestId,
+                    currentStateId = quest.CurrentState.Id,
+                };
+
+                // 存所有分支的任务进度（对齐 UE：整套分支都存，未访问分支进度为 0）。
+                foreach (var state in quest.AllStates)
+                {
+                    foreach (var branch in state.Branches)
+                    {
+                        if (branch == null)
+                        {
+                            continue;
+                        }
+
+                        var savedBranch = new SavedQuestBranch { branchId = branch.Id };
+                        foreach (var task in branch.Tasks)
+                        {
+                            savedBranch.taskProgress.Add(task != null ? task.CurrentProgress : 0);
+                        }
+
+                        saved.branches.Add(savedBranch);
+                    }
+                }
+
+                foreach (var reached in quest.ReachedStates)
+                {
+                    if (reached != null)
+                    {
+                        saved.reachedStateIds.Add(reached.Id);
+                    }
+                }
+
+                data.quests.Add(saved);
+            }
+
+            return data;
+        }
+
+        /// <summary>
+        /// 从一份存档还原叙事状态：清空当前任务与 data-task 表，按存档重建每个任务到其所处状态并回填进度。
+        /// 读档全程 <see cref="IsLoading"/>=true，不广播任何 OnQuest* 事件。对应 UE <c>PerformLoad</c>。
+        /// </summary>
+        /// <param name="data">存档数据。</param>
+        /// <param name="knownQuests">可能出现在存档里的全部任务资产（按 <see cref="QuestAsset.QuestId"/> 找回）。</param>
+        /// <returns>是否成功应用（data 为 null 返回 false）。存档里找不到对应资产的任务会被跳过并警告。</returns>
+        public bool RestoreNarrativeState(NarrativeSaveData data, IEnumerable<QuestAsset> knownQuests)
+        {
+            if (data == null)
+            {
+                return false;
+            }
+
+            // 建 questId → 资产 的查找表。
+            var catalog = new Dictionary<string, QuestAsset>();
+            if (knownQuests != null)
+            {
+                foreach (var asset in knownQuests)
+                {
+                    if (asset != null && !string.IsNullOrEmpty(asset.QuestId) && !catalog.ContainsKey(asset.QuestId))
+                    {
+                        catalog[asset.QuestId] = asset;
+                    }
+                }
+            }
+
+            _isLoading = true;
+            try
+            {
+                // 1. data-task 表整表还原（RestoreEntry 不触发完成事件）。
+                _masterTasks.Clear();
+                if (data.masterTasks != null)
+                {
+                    foreach (var entry in data.masterTasks)
+                    {
+                        if (entry != null)
+                        {
+                            _masterTasks.RestoreEntry(entry.task, entry.count);
+                        }
+                    }
+                }
+
+                // 2. 遗忘所有当前任务（静默移除，不广播 Forgotten）。
+                for (int i = _questList.Count - 1; i >= 0; i--)
+                {
+                    RemoveQuestInstance(_questList[i]);
+                }
+
+                // 3. 逐个重建存档里的任务。
+                if (data.quests != null)
+                {
+                    foreach (var savedQuest in data.quests)
+                    {
+                        if (savedQuest == null || string.IsNullOrEmpty(savedQuest.questId))
+                        {
+                            continue;
+                        }
+
+                        if (!catalog.TryGetValue(savedQuest.questId, out var asset))
+                        {
+                            Debug.LogWarning($"[Narrative] 读档跳过未知任务 \"{savedQuest.questId}\"——不在 knownQuests 里。");
+                            continue;
+                        }
+
+                        // 直接从存档所处状态开始（激活该状态的分支/任务，订阅宿主）。
+                        var quest = BeginQuest(asset, savedQuest.currentStateId);
+                        if (quest == null)
+                        {
+                            continue;
+                        }
+
+                        RestoreBranchProgress(quest, savedQuest.branches);
+                        quest.RestoreReachedStates(savedQuest.reachedStateIds);
+                    }
+                }
+            }
+            finally
+            {
+                _isLoading = false;
+            }
+
+            return true;
+        }
+
+        // 按分支 ID 把存档里的任务进度回填到重建后的任务上（RestoreProgress 不触发事件、不通知分支）。
+        private static void RestoreBranchProgress(Quest quest, List<SavedQuestBranch> savedBranches)
+        {
+            if (savedBranches == null)
+            {
+                return;
+            }
+
+            foreach (var state in quest.AllStates)
+            {
+                foreach (var branch in state.Branches)
+                {
+                    if (branch == null)
+                    {
+                        continue;
+                    }
+
+                    foreach (var savedBranch in savedBranches)
+                    {
+                        if (savedBranch == null || branch.Id != savedBranch.branchId)
+                        {
+                            continue;
+                        }
+
+                        var tasks = branch.Tasks;
+                        for (int i = 0; i < tasks.Count && i < savedBranch.taskProgress.Count; i++)
+                        {
+                            tasks[i]?.RestoreProgress(savedBranch.taskProgress[i]);
+                        }
+                    }
+                }
             }
         }
 

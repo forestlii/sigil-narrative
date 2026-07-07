@@ -17,7 +17,7 @@
 > 见[致谢](#致谢)。
 
 > **状态：开发中（`0.x`）。** 本包按里程碑逐步搭建。目前已交付：**Core 数据任务层**、**条件/事件节点模型**、
-> **对话**系统、**任务**状态机（均有 EditMode 测试覆盖）。存档/读档与图编辑器是下一步——见路线图。
+> **对话**系统、**任务**状态机、以及**叙事状态存档/读档**（均有 EditMode 测试覆盖）。图编辑器与端到端 demo 是下一步——见路线图。
 > 公开 API 未稳定，可能不经大版本号变更即破坏兼容。
 
 ## 安装
@@ -53,6 +53,8 @@
   以及与表现解耦的 `IDialoguePresenter`（可用 `DialogueAsset` 存成资产）。
 - **任务** —— `Quest` 状态机（`QuestState` / `QuestBranch` / `QuestTask`）、每次运行克隆的
   `QuestAsset` 模板，以及 `NarrativeComponent` 上的宿主侧管理 / 查询 / 事件。
+- **存档** —— 叙事状态存档/读档：JSON DTO（`NarrativeSaveData`）、宿主上的 `CaptureNarrativeState` /
+  `RestoreNarrativeState`，以及带可注入 `IFileSystem` 的 `NarrativeSaveManager`。
 - **宿主** —— `NarrativeComponent`（`MonoBehaviour`，无需继承基类）。
 - 以上全部的 EditMode 测试覆盖（在 6000.4.10f1 上全绿）。
 
@@ -66,8 +68,8 @@
 | Core：节点基类、条件、事件、上下文 | ✅ 完成 |
 | 对话：图、分块运行器、presenter 接口 | ✅ 完成 |
 | 任务：State / Branch / Task 状态机 + 宿主集成 | ✅ 完成 |
-| 存档：叙事状态的 JSON DTO 存/读 | ⏳ 下一步 |
-| 集成：端到端 demo | ⬜ 计划中 |
+| 存档：叙事状态的 JSON DTO 存/读 | ✅ 完成 |
+| 集成：端到端 demo | ⏳ 下一步 |
 
 刻意**排除在范围外**（与 Sigil GAS 核心同样的取舍）：战斗、联机/网络同步、AI、角色创建器、
 编辑器内的图编辑器。

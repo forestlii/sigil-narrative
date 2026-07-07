@@ -47,6 +47,9 @@ namespace Likeon.Narrative
         /// <summary>到达过的状态（按顺序，含当前）。对应 UE ReachedStates。</summary>
         public IReadOnlyList<QuestState> ReachedStates => _reached;
 
+        /// <summary>本任务的全部状态（供存档遍历分支/任务进度）。顺序不保证。</summary>
+        internal IReadOnlyCollection<QuestState> AllStates => _statesById.Values;
+
         public bool IsInProgress => Completion == EQuestCompletion.Started;
         public bool IsSucceeded => Completion == EQuestCompletion.Succeeded;
         public bool IsFailed => Completion == EQuestCompletion.Failed;
@@ -159,6 +162,28 @@ namespace Likeon.Narrative
         internal void Deinitialize()
         {
             CurrentState?.Deactivate();
+        }
+
+        /// <summary>
+        /// 读档用：清空到达过的状态、按存档的 ID 列表重填（跳过找不到的 ID）。不广播任何事件。
+        /// 对应 UE PerformLoad 里“清空 ReachedStates 再按 ReachedStateNames 重建”。
+        /// </summary>
+        internal void RestoreReachedStates(IEnumerable<string> reachedStateIds)
+        {
+            _reached.Clear();
+            if (reachedStateIds == null)
+            {
+                return;
+            }
+
+            foreach (var id in reachedStateIds)
+            {
+                var state = GetState(id);
+                if (state != null)
+                {
+                    _reached.Add(state);
+                }
+            }
         }
     }
 }

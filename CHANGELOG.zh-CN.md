@@ -38,4 +38,11 @@
   `QuestStarted` / `QuestForgotten` / `QuestRestarted` / `QuestNewState` / `QuestBranchCompleted` /
   `QuestTaskProgressChanged` / `QuestTaskCompleted` / `QuestSucceeded` / `QuestFailed`。
   遗忘/重启时 `Quest.Deinitialize` 结束进行中的任务（解绑宿主订阅）。
+- `Save`（叙事状态，仅单机路径一）：`NarrativeSaveData` DTO（经 `JsonUtility` 走 JSON），保存任务进度
+  （所处状态、各分支任务进度、到达过的状态）加主任务表；`QuestAsset.QuestId` 作稳定存档键。
+  `NarrativeComponent.CaptureNarrativeState` / `RestoreNarrativeState(data, knownQuests)` 对应
+  UE `PrepareForSave` / `PerformLoad`——读档把每个任务重建到存档所处状态、用不广播的 `RestoreProgress`
+  回填进度，全程静默（`IsLoading`，不触发任何 `OnQuest*` 事件）。`NarrativeSaveManager` 负责 JSON + 文件读写，
+  文件层走可注入的 `IFileSystem`（默认 `DiskFileSystem`）。注：`NarrativeEvent.RefireOnLoad` 暂无消费者
+  ——本移植的任务状态不携带事件。
 - 文档：双语 README、MIT `LICENSE`、以及双语使用指南（`Documentation~/Usage.md`）。

@@ -15,8 +15,18 @@ namespace Likeon.Narrative
     [CreateAssetMenu(fileName = "Quest", menuName = "Sigil/Narrative/Quest", order = 11)]
     public sealed class QuestAsset : ScriptableObject
     {
+        [Tooltip("任务的稳定身份 ID：存档按它定位任务、读档按它找回资产。留空则回退用资产名。\n" +
+                 "对应 UE 里用 QuestClass 当身份——单机存档需要一个跨会话稳定的字符串键。建议显式填写并保持不变。")]
+        [SerializeField] private string questId;
+
         [Tooltip("起始状态 ID。Begin 时若不指定则从此状态进入。对应 UE 的 QuestStartState。")]
         [SerializeField] private string startStateId;
+
+        /// <summary>
+        /// 任务的稳定身份 ID（存档/读档的键）。留空则回退到资产名（<see cref="Object.name"/>）。
+        /// ⚠ 一旦有存档就别再改它，否则旧存档里的该任务会认不回来。对应 UE 用 QuestClass 当身份键。
+        /// </summary>
+        public string QuestId => string.IsNullOrEmpty(questId) ? name : questId;
 
         [Tooltip("状态集。用 SerializeReference 规避深层嵌套序列化的深度上限。")]
         [SerializeReference] private List<QuestState> states = new List<QuestState>();

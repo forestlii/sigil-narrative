@@ -5,8 +5,8 @@
 A practical guide to using the narrative framework: **data-tasks**, the **condition/event** node
 model, **dialogue**, and the **quest** state machine, all driven through one host component.
 
-> **Status: `0.x`, work in progress.** Save/load and an in-editor graph editor are not shipped yet
-> (see [What's not here yet](#whats-not-here-yet)). The public API is unstable and may change.
+> **Status: `0.x`, work in progress.** An in-editor graph editor is not shipped yet (see
+> [What's not here yet](#whats-not-here-yet)). The public API is unstable and may change.
 
 ## Contents
 
@@ -17,9 +17,10 @@ model, **dialogue**, and the **quest** state machine, all driven through one hos
 5. [Conditions & events (the node model)](#conditions--events-the-node-model)
 6. [Dialogue](#dialogue)
 7. [Quests](#quests)
-8. [`NarrativeComponent` cheat sheet](#narrativecomponent-cheat-sheet)
-9. [Coming from Narrative Pro / UE?](#coming-from-narrative-pro--ue)
-10. [What's not here yet](#whats-not-here-yet)
+8. [Saving & loading](#saving--loading)
+9. [`NarrativeComponent` cheat sheet](#narrativecomponent-cheat-sheet)
+10. [Coming from Narrative Pro / UE?](#coming-from-narrative-pro--ue)
+11. [What's not here yet](#whats-not-here-yet)
 
 ---
 
@@ -298,6 +299,50 @@ host.QuestRestarted          += oldInstance => { }; // carries the replaced inst
 > so they unsubscribe from the host — a forgotten quest's tasks will **not** keep consuming
 > data-tasks. Always drop quests through the host, not by holding your own reference.
 
+## Saving & loading
+
+The narrative save covers **narrative state only** — quest progress and the master task list.
+(Dialogue is transient and not saved; general world-object saving is a later milestone.) Two host
+methods mirror the original's `PrepareForSave` / `PerformLoad`:
+
+```csharp
+// Capture a snapshot (per-quest current state + branch task progress + reached states, plus the
+// master task list) into a plain, JSON-friendly DTO.
+NarrativeSaveData data = host.CaptureNarrativeState();
+
+// ... later, on a fresh host — rebuild every quest at its saved state and refill progress.
+// `knownQuests` is your catalog of QuestAssets that could appear in a save (matched by QuestId).
+host.RestoreNarrativeState(data, allMyQuestAssets);
+```
+
+Restore is **silent**: it rebuilds quests without firing any `OnQuest*` host events (`host.IsLoading`
+is `true` for the duration), so your UI won't see a burst of fake "quest started" events on load.
+Restored quests are **live** — their tasks re-subscribe to the host, so gameplay continues normally.
+
+> 📌 Each `QuestAsset` needs a stable **`QuestId`** (set it on the asset; it falls back to the asset
+> name if left blank). It is the save key — **don't change it once players have saves**, or those
+> quests won't be recognized on load.
+
+Serialize the DTO to JSON and to disk with `NarrativeSaveManager`. File I/O goes through an
+injectable `IFileSystem` (default `DiskFileSystem`), so tests can pass an in-memory fake:
+
+```csharp
+var manager = new NarrativeSaveManager();                  // or new NarrativeSaveManager(myFileSystem)
+string path = System.IO.Path.Combine(Application.persistentDataPath, "narrative.json");
+
+manager.Save(path, host.CaptureNarrativeState());          // write JSON
+NarrativeSaveData loaded = manager.Load(path);             // read back (null if missing)
+if (loaded != null) host.RestoreNarrativeState(loaded, allMyQuestAssets);
+
+// Or just the JSON string, no files:
+string json = NarrativeSaveManager.ToJson(data);
+NarrativeSaveData back = NarrativeSaveManager.FromJson(json);
+```
+
+> 💡 `NarrativeEvent.RefireOnLoad` exists on the event base but has **no consumer yet** — quest states
+> carry no events in this port, so nothing re-fires on load. It becomes relevant if/when quest-state
+> events are added.
+
 ## `NarrativeComponent` cheat sheet
 
 ```csharp
@@ -333,6 +378,11 @@ event Action<Quest, QuestState> QuestNewState;
 event Action<Quest, QuestBranch> QuestBranchCompleted;
 event Action<Quest, QuestBranch, QuestTask, int, int> QuestTaskProgressChanged;
 event Action<Quest, QuestBranch, QuestTask> QuestTaskCompleted;
+
+// ---- Save (narrative state) ----
+NarrativeSaveData CaptureNarrativeState();
+bool RestoreNarrativeState(NarrativeSaveData data, IEnumerable<QuestAsset> knownQuests);
+bool IsLoading { get; }
 ```
 
 Dialogue is **not** run through the host in this version — construct a `DialogueController` directly
@@ -358,12 +408,13 @@ This is a from-scratch C# reimplementation of the **design** of Narrative Pro / 
 
 ## What's not here yet
 
-- **Save / load.** Progress lives in the runtime instances (`MasterTaskList` counts, quest
-  `CurrentState` + per-task progress). A JSON DTO save layer with `bRefireOnLoad` semantics is the
-  next milestone. `MasterTaskList.RestoreEntry` and `QuestTask.RestoreProgress` already exist as the
-  load hooks.
 - **In-editor graph editors** for dialogue and quests — author flat templates via the Inspector for
   now (rough for large graphs).
+- **General world-object saving** (GUID-keyed, arbitrary components). The shipped save layer covers
+  narrative state only (quests + data-tasks); a generic `ISaveable` / `SaveableEntity` path is a
+  later milestone.
+- **Quest-state events** — quest states don't carry `NarrativeEvent`s yet, so `RefireOnLoad` is
+  dormant and there are no on-enter-state side effects.
 - **Presentation layer** (cutscenes, camera, avatars), **combat/GAS integration**, **AI**,
   **networking/replication**, **character creator** — intentionally out of scope, mirroring the same
   cuts as the Sigil GAS core.

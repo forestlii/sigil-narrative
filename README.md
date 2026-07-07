@@ -18,9 +18,10 @@ system from [`com.likeon.gas`](https://github.com/forestlii/sigil-gas) rather th
 > source code is included. See [Attribution](#attribution).
 
 > **Status: work-in-progress (`0.x`).** Built milestone by milestone. Shipped today: the **Core
-> data-task layer**, the **condition/event node model**, the **dialogue** system, and the **quest**
-> state machine (all with EditMode coverage). Save/load and an in-editor graph editor are next — see
-> the roadmap. The public API is unstable and may break without a major bump.
+> data-task layer**, the **condition/event node model**, the **dialogue** system, the **quest**
+> state machine, and **narrative-state save/load** (all with EditMode coverage). An in-editor graph
+> editor and an end-to-end demo are next — see the roadmap. The public API is unstable and may break
+> without a major bump.
 
 ## Install
 
@@ -59,6 +60,8 @@ project folder, add it to `"testables"` in your project's `Packages/manifest.jso
   presentation-agnostic `IDialoguePresenter` (`DialogueAsset` to store one as an asset).
 - **Quests** — the `Quest` state machine (`QuestState` / `QuestBranch` / `QuestTask`), `QuestAsset`
   templates cloned per run, and host-side management / queries / events on `NarrativeComponent`.
+- **Save** — narrative-state save/load: a JSON DTO (`NarrativeSaveData`), `CaptureNarrativeState` /
+  `RestoreNarrativeState` on the host, and `NarrativeSaveManager` with an injectable `IFileSystem`.
 - **Host** — `NarrativeComponent` (a `MonoBehaviour`, no base class to inherit).
 - EditMode test coverage across all of the above (green on 6000.4.10f1).
 
@@ -72,8 +75,8 @@ See **[`Documentation~/Usage.md`](Documentation~/Usage.md)** for the full guide.
 | Core: node base, conditions, events, context | ✅ done |
 | Dialogue: graph, chunk-based runner, presenter interface | ✅ done |
 | Quest: State / Branch / Task state machine + host integration | ✅ done |
-| Save: JSON DTO save/load for narrative state | ⏳ next |
-| Integration: end-to-end demo | ⬜ planned |
+| Save: JSON DTO save/load for narrative state | ✅ done |
+| Integration: end-to-end demo | ⏳ next |
 
 Intentionally **out of scope** (mirrors the same cuts as the Sigil GAS core): combat, networking/
 replication, AI, character creator, and in-editor graph editors.
