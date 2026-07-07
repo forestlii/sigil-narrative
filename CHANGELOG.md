@@ -27,4 +27,9 @@ While the public API is unstable it stays in the `0.y.z` range and may break wit
 - `Dialogue` runtime: `DialogueController` (chunk advance — NPC reply chain, condition-filtered
   player options, auto-select, next-chunk generation) and the presentation-agnostic
   `IDialoguePresenter` interface; `DialogueAsset` (ScriptableObject wrapper for a `DialogueGraph`).
+- `Quest` system: the `Quest` state machine (`QuestState` / `QuestBranch` / `QuestTask`,
+  `EnterState`/`TakeBranch`, Success/Failure terminal states) with the full event set
+  (Started / NewState / TaskProgressChanged / TaskCompleted / BranchCompleted / Succeeded / Failed);
+  abstract `QuestTask` (progress, `Optional` — always-complete for gating, `Hidden`, tick hook);
+  and built-in `CompleteDataTaskQuestTask` (advances when a matching data-task completes).
 - Docs: bilingual README, MIT `LICENSE`, and a bilingual devlog under `Documentation~/`.

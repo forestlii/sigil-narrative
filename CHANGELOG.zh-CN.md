@@ -25,4 +25,8 @@
   以及 `DialogueGraph`（扁平节点表 + by-ID 查找）。
 - `Dialogue` 运行时：`DialogueController`（chunk 推进——NPC 回复链、条件过滤玩家选项、自动选择、
   生成下一 chunk）与表现层无关的 `IDialoguePresenter` 接口；`DialogueAsset`（包 `DialogueGraph` 的 ScriptableObject）。
+- `Quest` 系统：`Quest` 状态机（`QuestState` / `QuestBranch` / `QuestTask`、`EnterState`/`TakeBranch`、
+  Success/Failure 终止态）+ 全套事件（Started / NewState / TaskProgressChanged / TaskCompleted /
+  BranchCompleted / Succeeded / Failed）；抽象 `QuestTask`（进度、`Optional`——门控里恒视为完成、
+  `Hidden`、tick 钩子）；内置 `CompleteDataTaskQuestTask`（匹配 data-task 完成时推进）。
 - 文档：双语 README、MIT `LICENSE`、以及 `Documentation~/` 下的双语 devlog。
