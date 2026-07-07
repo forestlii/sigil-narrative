@@ -14,4 +14,10 @@
   `Likeon.Narrative.Runtime` / `.Editor` / `.Tests.EditMode` 程序集定义。
 - `Core`：`DataTaskDefinition`（轻量 `名_参数` 任务标记）与 `MasterTaskList`
   （已完成 data-task 的持久记录；任务与对话的耦合点）。
+- `Core` 框架：`NarrativeNodeBase`（ID + 条件 + 事件）、抽象 `NarrativeCondition`（带 `Not`）与
+  `NarrativeEvent`（带 `EEventRuntime` Start/End/Both、`RefireOnLoad`、事件级条件）、
+  `NarrativeContext`、以及 `INarrativeHost` 契约。
+- 宿主：`NarrativeComponent`（实现 `INarrativeHost` 的 MonoBehaviour）——不强制继承基类；
+  记录/查询 data-task 并广播完成。
+- 内置：`HasCompletedTaskCondition` 与 `CompleteDataTaskEvent`。
 - 文档：双语 README、MIT `LICENSE`、以及 `Documentation~/` 下的双语 devlog。

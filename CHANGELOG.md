@@ -14,4 +14,10 @@ While the public API is unstable it stays in the `0.y.z` range and may break wit
   `Likeon.Narrative.Runtime` / `.Editor` / `.Tests.EditMode` assembly definitions.
 - `Core`: `DataTaskDefinition` (lightweight `Name_Argument` task marker) and `MasterTaskList`
   (persistent record of completed data-tasks; the coupling point between quests and dialogue).
+- `Core` framework: `NarrativeNodeBase` (id + conditions + events), abstract `NarrativeCondition`
+  (with `Not`) and `NarrativeEvent` (with `EEventRuntime` Start/End/Both, `RefireOnLoad`, and
+  event-level conditions), `NarrativeContext`, and the `INarrativeHost` contract.
+- Host: `NarrativeComponent` (MonoBehaviour implementing `INarrativeHost`) — no forced base class;
+  records/queries data-tasks and broadcasts completion.
+- Built-ins: `HasCompletedTaskCondition` and `CompleteDataTaskEvent`.
 - Docs: bilingual README, MIT `LICENSE`, and a bilingual devlog under `Documentation~/`.
