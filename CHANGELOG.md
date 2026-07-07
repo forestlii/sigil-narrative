@@ -20,4 +20,8 @@ While the public API is unstable it stays in the `0.y.z` range and may break wit
 - Host: `NarrativeComponent` (MonoBehaviour implementing `INarrativeHost`) — no forced base class;
   records/queries data-tasks and broadcasts completion.
 - Built-ins: `HasCompletedTaskCondition` and `CompleteDataTaskEvent`.
+- `Dialogue` data model: `DialogueLine` (+ `ELineDuration`, reading-time and Default-fallback
+  resolution, condition-gated selection), `DialogueNode` / `DialogueNode_NPC` / `DialogueNode_Player`
+  (routing detection, auto-select, condition-filtered line selection), and `DialogueGraph`
+  (flat node list with by-ID lookup).
 - Docs: bilingual README, MIT `LICENSE`, and a bilingual devlog under `Documentation~/`.
