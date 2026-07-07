@@ -125,6 +125,21 @@ namespace Likeon.Narrative
             _currentProgress = Mathf.Clamp(progress, 0, requiredQuantity);
         }
 
+        /// <summary>
+        /// 从模板克隆出一个干净的运行时副本：拷贝所有序列化配置（含子类字段），
+        /// 但把运行时状态（进度/激活/绑定）清零。对应 UE 的“每次 BeginQuest 从 QuestClass 新建实例”。
+        /// 用 <see cref="object.MemberwiseClone"/> 天然覆盖子类的私有序列化字段，无需子类各自实现。
+        /// </summary>
+        internal QuestTask CloneForRuntime()
+        {
+            var clone = (QuestTask)MemberwiseClone();
+            clone._currentProgress = 0;
+            clone._isActive = false;
+            clone._branch = null;
+            clone._context = null;
+            return clone;
+        }
+
         // ---------------- 描述 ----------------
 
         /// <summary>任务描述：优先覆盖文本，否则子类自动生成。对应 UE GetTaskDescription。</summary>

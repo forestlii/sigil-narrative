@@ -13,3 +13,7 @@ Thumbs.db
 [Oo]bj/
 [Bb]uild/
 [Ll]ogs/
+
+# Devlog is kept local only (internal development story) — not published. Usage.md stays public.
+Documentation~/Devlog.md
+Documentation~/Devlog.zh-CN.md

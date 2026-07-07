@@ -35,6 +35,9 @@ namespace Likeon.Narrative
             }
         }
 
+        /// <summary>本实例的来源资产（宿主用它作 quest 身份键，对应 UE 的 QuestClass）。由 <see cref="QuestAsset"/> 实例化时写入。</summary>
+        public QuestAsset SourceAsset { get; internal set; }
+
         /// <summary>完成状态。对应 UE QuestCompletion。</summary>
         public EQuestCompletion Completion { get; private set; } = EQuestCompletion.NotStarted;
 
@@ -147,6 +150,15 @@ namespace Likeon.Narrative
         internal void NotifyTaskCompleted(QuestBranch branch, QuestTask task)
         {
             TaskCompleted?.Invoke(this, branch, task);
+        }
+
+        /// <summary>
+        /// 停用任务：结束当前状态的分支任务（让任务解绑宿主事件等），供宿主遗忘/重启时清理。
+        /// 对应 UE <c>UQuest::Deinitialize</c>。不广播任何 quest 事件。
+        /// </summary>
+        internal void Deinitialize()
+        {
+            CurrentState?.Deactivate();
         }
     }
 }

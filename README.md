@@ -10,16 +10,17 @@ system from [`com.likeon.gas`](https://github.com/forestlii/sigil-gas) rather th
 - **Scope:** single-player logic (no networking, no combat — see roadmap)
 - **Publisher:** Likeon · namespace `Likeon.Narrative`
 - **Depends on:** [`com.likeon.gas`](https://github.com/forestlii/sigil-gas) (GameplayTag system)
-- **Devlog:** the development story & design decisions live in [`Documentation~/Devlog.md`](Documentation~/Devlog.md)
+- **Usage:** full guide in [`Documentation~/Usage.md`](Documentation~/Usage.md) (English / 简体中文)
 
 > This reimplements the **design** of *Narrative Pro / Narrative Arsenal* by Narrative Tools —
 > the dialogue graph, quest state machine and data-task model — as an independent C# rewrite for
 > Unity, from scratch. No third-party engine or
 > source code is included. See [Attribution](#attribution).
 
-> **Status: early / work-in-progress (`0.x`).** The package is being built milestone by milestone.
-> What exists today is the package skeleton and the **Core data-task layer**; dialogue, quest and
-> save are on the roadmap below. The public API is unstable and may break without a major bump.
+> **Status: work-in-progress (`0.x`).** Built milestone by milestone. Shipped today: the **Core
+> data-task layer**, the **condition/event node model**, the **dialogue** system, and the **quest**
+> state machine (all with EditMode coverage). Save/load and an in-editor graph editor are next — see
+> the roadmap. The public API is unstable and may break without a major bump.
 
 ## Install
 
@@ -49,22 +50,30 @@ project folder, add it to `"testables"` in your project's `Packages/manifest.jso
 
 ## What's here today
 
-- **`DataTaskDefinition`** — a lightweight `Name_Argument` task marker (a `ScriptableObject`),
-  normalized the same way as the original (`lowercased, spaces stripped`).
-- **`MasterTaskList`** — the persistent record of completed data-tasks (the coupling point between
-  quests and dialogue, and a save-core primitive).
-- EditMode test coverage for the above (green on 6000.4.10f1).
+- **Data tasks** — `DataTaskDefinition` (a `Name_Argument` `ScriptableObject`, normalized like the
+  original) and `MasterTaskList` (the persistent completed-task record; the coupling point between
+  dialogue and quests).
+- **Node model** — `NarrativeNodeBase` with `[SerializeReference]` `NarrativeCondition` /
+  `NarrativeEvent`, plus built-ins (`HasCompletedTaskCondition`, `CompleteDataTaskEvent`).
+- **Dialogue** — a flat ID-linked `DialogueGraph`, a chunk-based `DialogueController`, and the
+  presentation-agnostic `IDialoguePresenter` (`DialogueAsset` to store one as an asset).
+- **Quests** — the `Quest` state machine (`QuestState` / `QuestBranch` / `QuestTask`), `QuestAsset`
+  templates cloned per run, and host-side management / queries / events on `NarrativeComponent`.
+- **Host** — `NarrativeComponent` (a `MonoBehaviour`, no base class to inherit).
+- EditMode test coverage across all of the above (green on 6000.4.10f1).
+
+See **[`Documentation~/Usage.md`](Documentation~/Usage.md)** for the full guide.
 
 ## Roadmap
 
 | Milestone | Status |
 |---|---|
 | Package scaffold + Core data-task layer | ✅ done |
-| Core: node base, conditions, events, context | ⏳ next |
-| Dialogue: graph, chunk-based runner, presenter interface | ⬜ planned |
-| Quest: State / Branch / Task state machine | ⬜ planned |
-| Save: JSON DTO save/load for narrative state | ⬜ planned |
-| Integration: `NarrativeComponent` host + end-to-end demo | ⬜ planned |
+| Core: node base, conditions, events, context | ✅ done |
+| Dialogue: graph, chunk-based runner, presenter interface | ✅ done |
+| Quest: State / Branch / Task state machine + host integration | ✅ done |
+| Save: JSON DTO save/load for narrative state | ⏳ next |
+| Integration: end-to-end demo | ⬜ planned |
 
 Intentionally **out of scope** (mirrors the same cuts as the Sigil GAS core): combat, networking/
 replication, AI, character creator, and in-editor graph editors.

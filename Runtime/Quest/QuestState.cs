@@ -49,6 +49,25 @@ namespace Likeon.Narrative
             }
         }
 
+        /// <summary>从模板克隆出干净的运行时副本（保留 id/nodeType，逐个克隆分支）。</summary>
+        internal QuestState CloneForRuntime()
+        {
+            var clone = (QuestState)MemberwiseClone(); // 拷贝 id/nodeType 等私有字段
+            clone.branches = new List<QuestBranch>();
+            if (branches != null)
+            {
+                foreach (var branch in branches)
+                {
+                    if (branch != null)
+                    {
+                        clone.branches.Add(branch.CloneForRuntime());
+                    }
+                }
+            }
+
+            return clone;
+        }
+
         internal void Activate(Quest quest, NarrativeContext context)
         {
             if (branches == null)

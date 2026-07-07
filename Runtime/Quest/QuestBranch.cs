@@ -52,6 +52,26 @@ namespace Likeon.Narrative
             }
         }
 
+        /// <summary>从模板克隆出干净的运行时副本（保留 id/hidden/目标状态，逐个克隆任务，清空 quest 绑定）。</summary>
+        internal QuestBranch CloneForRuntime()
+        {
+            var clone = (QuestBranch)MemberwiseClone(); // 拷贝 id/hidden/destinationStateId 等私有字段
+            clone._quest = null;
+            clone.tasks = new List<QuestTask>();
+            if (tasks != null)
+            {
+                foreach (var task in tasks)
+                {
+                    if (task != null)
+                    {
+                        clone.tasks.Add(task.CloneForRuntime());
+                    }
+                }
+            }
+
+            return clone;
+        }
+
         internal void Activate(Quest quest, NarrativeContext context)
         {
             _quest = quest;

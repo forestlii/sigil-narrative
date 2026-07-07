@@ -32,4 +32,14 @@ While the public API is unstable it stays in the `0.y.z` range and may break wit
   (Started / NewState / TaskProgressChanged / TaskCompleted / BranchCompleted / Succeeded / Failed);
   abstract `QuestTask` (progress, `Optional` — always-complete for gating, `Hidden`, tick hook);
   and built-in `CompleteDataTaskQuestTask` (advances when a matching data-task completes).
-- Docs: bilingual README, MIT `LICENSE`, and a bilingual devlog under `Documentation~/`.
+- `Quest` asset & host integration: `QuestAsset` (ScriptableObject template holding a start-state id
+  and a state set; `CreateRuntimeQuest` deep-clones states/branches/tasks so the template stays pristine
+  and each run gets fresh progress). `NarrativeComponent` now manages a quest list keyed by asset —
+  `BeginQuest` / `RestartQuest` / `ForgetQuest`, queries (`GetQuestInstance`,
+  `IsQuestInProgress` / `IsQuestSucceeded` / `IsQuestFailed` / `IsQuestFinished` /
+  `IsQuestStartedOrFinished`, `GetInProgressQuests` / `GetSucceededQuests` / `GetFailedQuests`,
+  `AllQuests`) — and bridges each running quest's events to host-level
+  `QuestStarted` / `QuestForgotten` / `QuestRestarted` / `QuestNewState` / `QuestBranchCompleted` /
+  `QuestTaskProgressChanged` / `QuestTaskCompleted` / `QuestSucceeded` / `QuestFailed`.
+  `Quest.Deinitialize` ends active tasks (unsubscribing host hooks) on forget/restart.
+- Docs: bilingual README, MIT `LICENSE`, and a bilingual usage guide (`Documentation~/Usage.md`).

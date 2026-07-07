@@ -29,4 +29,13 @@
   Success/Failure 终止态）+ 全套事件（Started / NewState / TaskProgressChanged / TaskCompleted /
   BranchCompleted / Succeeded / Failed）；抽象 `QuestTask`（进度、`Optional`——门控里恒视为完成、
   `Hidden`、tick 钩子）；内置 `CompleteDataTaskQuestTask`（匹配 data-task 完成时推进）。
-- 文档：双语 README、MIT `LICENSE`、以及 `Documentation~/` 下的双语 devlog。
+- `Quest` 资产与宿主集成：`QuestAsset`（ScriptableObject 模板，持起始状态 ID + 状态集；
+  `CreateRuntimeQuest` 深克隆状态/分支/任务，模板保持纯净、每次运行都是全新进度）。
+  `NarrativeComponent` 现以资产为身份键管理任务列表——`BeginQuest` / `RestartQuest` / `ForgetQuest`、
+  查询（`GetQuestInstance`、`IsQuestInProgress` / `IsQuestSucceeded` / `IsQuestFailed` / `IsQuestFinished` /
+  `IsQuestStartedOrFinished`、`GetInProgressQuests` / `GetSucceededQuests` / `GetFailedQuests`、`AllQuests`）——
+  并把每个运行中任务的事件桥接到宿主级
+  `QuestStarted` / `QuestForgotten` / `QuestRestarted` / `QuestNewState` / `QuestBranchCompleted` /
+  `QuestTaskProgressChanged` / `QuestTaskCompleted` / `QuestSucceeded` / `QuestFailed`。
+  遗忘/重启时 `Quest.Deinitialize` 结束进行中的任务（解绑宿主订阅）。
+- 文档：双语 README、MIT `LICENSE`、以及双语使用指南（`Documentation~/Usage.md`）。
