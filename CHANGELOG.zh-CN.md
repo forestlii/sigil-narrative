@@ -23,4 +23,6 @@
 - `Dialogue` 数据模型：`DialogueLine`（+ `ELineDuration`、阅读时长与 Default 回退解析、条件门控选行）、
   `DialogueNode` / `DialogueNode_NPC` / `DialogueNode_Player`（路由判定、自动选择、条件过滤选行）、
   以及 `DialogueGraph`（扁平节点表 + by-ID 查找）。
+- `Dialogue` 运行时：`DialogueController`（chunk 推进——NPC 回复链、条件过滤玩家选项、自动选择、
+  生成下一 chunk）与表现层无关的 `IDialoguePresenter` 接口；`DialogueAsset`（包 `DialogueGraph` 的 ScriptableObject）。
 - 文档：双语 README、MIT `LICENSE`、以及 `Documentation~/` 下的双语 devlog。

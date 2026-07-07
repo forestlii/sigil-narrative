@@ -128,10 +128,16 @@ namespace Likeon.Narrative
         }
 
         /// <summary>
-        /// 是否是纯路由节点（不含任何对话文本，只用于连线）。对应 UE <c>IsRoutingNode</c>。
+        /// 是否是纯路由节点（不含任何对话文本、也没有事件，只用于连线）。对应 UE <c>IsRoutingNode</c>。
+        /// （UE 还检查 shot/sound，本核心不含表现字段故略去。）
         /// </summary>
         public bool IsRoutingNode()
         {
+            if (Events != null && Events.Count > 0)
+            {
+                return false;
+            }
+
             if (line != null && !string.IsNullOrEmpty(line.Text))
             {
                 return false;

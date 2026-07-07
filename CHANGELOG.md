@@ -24,4 +24,7 @@ While the public API is unstable it stays in the `0.y.z` range and may break wit
   resolution, condition-gated selection), `DialogueNode` / `DialogueNode_NPC` / `DialogueNode_Player`
   (routing detection, auto-select, condition-filtered line selection), and `DialogueGraph`
   (flat node list with by-ID lookup).
+- `Dialogue` runtime: `DialogueController` (chunk advance — NPC reply chain, condition-filtered
+  player options, auto-select, next-chunk generation) and the presentation-agnostic
+  `IDialoguePresenter` interface; `DialogueAsset` (ScriptableObject wrapper for a `DialogueGraph`).
 - Docs: bilingual README, MIT `LICENSE`, and a bilingual devlog under `Documentation~/`.
