@@ -34,6 +34,7 @@ namespace Likeon.Narrative
         private bool _isActive;
         private QuestBranch _branch;
         private NarrativeContext _context;
+        private float _tickAccumulator;
 
         public int RequiredQuantity => requiredQuantity;
         public int CurrentProgress => _currentProgress;
@@ -57,6 +58,12 @@ namespace Likeon.Narrative
             optional = isOptional;
         }
 
+        /// <summary>供子类构造函数设置轮询间隔秒数（代码构建/测试用；下限 0）。</summary>
+        protected void SetTickIntervalForConstruction(float seconds)
+        {
+            tickInterval = Mathf.Max(0f, seconds);
+        }
+
         /// <summary>是否已完成。对应 UE <c>IsComplete</c>：进度达标 或 可选。</summary>
         public bool IsComplete => _currentProgress >= requiredQuantity || optional;
 
@@ -67,7 +74,31 @@ namespace Likeon.Narrative
             _branch = branch;
             _context = context;
             _isActive = true;
+            _tickAccumulator = 0f;
             OnBeginTask();
+        }
+
+        /// <summary>
+        /// 按流逝时间驱动轮询：累积到 <see cref="TickInterval"/> 就调一次 <see cref="Tick"/>（可能一帧补多次）。
+        /// 仅对激活中、且 <see cref="TickInterval"/> &gt; 0 的任务有效。由 <see cref="NarrativeComponent.TickActiveTasks"/> 调用。
+        /// 对应 UE 用 TimerManager 按 TickInterval 重复调 TickTask——这里换成宿主每帧喂 deltaTime。
+        /// 注：不移植 UE“BeginTask 后立即 tick 一次”的行为；初始检查请写在 <see cref="OnBeginTask"/> 里。
+        /// </summary>
+        internal void DriveTick(float deltaSeconds)
+        {
+            if (!_isActive || tickInterval <= 0f || deltaSeconds <= 0f)
+            {
+                return;
+            }
+
+            _tickAccumulator += deltaSeconds;
+            // 防呆：间隔极小 + dt 极大时限制单帧补 tick 次数，避免卡死。
+            int guard = 0;
+            while (_tickAccumulator >= tickInterval && _isActive && guard++ < 1000)
+            {
+                _tickAccumulator -= tickInterval;
+                Tick();
+            }
         }
 
         internal void End()

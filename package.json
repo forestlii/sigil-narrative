@@ -19,5 +19,12 @@
   "license": "MIT",
   "dependencies": {
     "com.likeon.gas": "0.7.2"
-  }
+  },
+  "samples": [
+    {
+      "displayName": "End-to-end demo",
+      "description": "One script: begin quest → play dialogue → event completes a data-task → quest succeeds → save → restore.",
+      "path": "Samples~/EndToEndDemo"
+    }
+  ]
 }

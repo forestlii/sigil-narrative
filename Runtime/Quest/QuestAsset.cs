@@ -42,6 +42,24 @@ namespace Likeon.Narrative
         public IReadOnlyList<QuestState> States => states;
 
         /// <summary>
+        /// 在代码里构造一个任务资产模板（用于程序化生成任务、样例、测试——正常玩法里在 Inspector 里编辑资产）。
+        /// 返回的是内存中的 <see cref="ScriptableObject"/>，未落盘。
+        /// </summary>
+        public static QuestAsset Create(string questId, string startStateId, IEnumerable<QuestState> states)
+        {
+            var asset = CreateInstance<QuestAsset>();
+            asset.questId = questId;
+            asset.startStateId = startStateId;
+            asset.states = states != null ? new List<QuestState>(states) : new List<QuestState>();
+            if (!string.IsNullOrEmpty(questId))
+            {
+                asset.name = questId;
+            }
+
+            return asset;
+        }
+
+        /// <summary>
         /// 克隆出一个干净的运行时 <see cref="Quest"/>：深拷贝所有状态/分支/任务，进度清零，
         /// 并回填 <see cref="Quest.SourceAsset"/> 指回本资产。模板自身不被改动。
         /// </summary>

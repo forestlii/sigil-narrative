@@ -47,6 +47,23 @@ namespace Likeon.Narrative
         public string TaskCategory => taskCategory ?? string.Empty;
 
         /// <summary>
+        /// 在代码里构造一个数据任务定义（用于程序化生成、样例、测试——正常玩法里在 Inspector 里创建资产）。
+        /// 返回的是内存中的 <see cref="ScriptableObject"/>，未落盘。
+        /// </summary>
+        public static DataTaskDefinition Create(string taskName, string defaultArgument = null)
+        {
+            var task = CreateInstance<DataTaskDefinition>();
+            task.taskName = taskName;
+            task.defaultArgument = defaultArgument;
+            if (!string.IsNullOrEmpty(taskName))
+            {
+                task.name = taskName;
+            }
+
+            return task;
+        }
+
+        /// <summary>
         /// 把任务名与参数拍成一个规范化原始串，供状态机 / 存档 / 查询使用。
         /// 对应 UE <c>UNarrativeDataTask::MakeTaskString</c>：<c>(TaskName + '_' + Argument)</c> 转小写、再删去所有空格。
         /// 例：TaskName="Talk To"、Argument="King Bob" → "talkto_kingbob"。

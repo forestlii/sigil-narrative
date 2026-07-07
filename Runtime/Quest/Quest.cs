@@ -165,6 +165,39 @@ namespace Likeon.Narrative
         }
 
         /// <summary>
+        /// 驱动当前状态下所有激活任务的轮询（<see cref="QuestTask.DriveTick"/>）。
+        /// 先快照分支/任务再逐个 tick，并在 tick 前复查 <see cref="QuestTask.IsActive"/>——
+        /// 因为某次 tick 可能让任务达标、取分支、切状态，从而使后续任务失活，避免对已失活任务再 tick 或迭代中集合被改。
+        /// </summary>
+        internal void TickActiveTasks(float deltaSeconds)
+        {
+            var state = CurrentState;
+            if (state == null || Completion != EQuestCompletion.Started)
+            {
+                return;
+            }
+
+            // 快照，防 tick 引发状态切换时改动正在迭代的集合。
+            var branches = new List<QuestBranch>(state.Branches);
+            foreach (var branch in branches)
+            {
+                if (branch == null)
+                {
+                    continue;
+                }
+
+                var tasks = new List<QuestTask>(branch.Tasks);
+                foreach (var task in tasks)
+                {
+                    if (task != null && task.IsActive)
+                    {
+                        task.DriveTick(deltaSeconds);
+                    }
+                }
+            }
+        }
+
+        /// <summary>
         /// 读档用：清空到达过的状态、按存档的 ID 列表重填（跳过找不到的 ID）。不广播任何事件。
         /// 对应 UE PerformLoad 里“清空 ReachedStates 再按 ReachedStateNames 重建”。
         /// </summary>

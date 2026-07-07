@@ -239,6 +239,29 @@ namespace Likeon.Narrative
         /// <summary>所有已失败的任务，按先后顺序。对应 UE <c>GetFailedQuests</c>。</summary>
         public List<Quest> GetFailedQuests() => FilterQuests(q => q.IsFailed);
 
+        /// <summary>
+        /// 驱动所有进行中任务的当前激活任务轮询（<see cref="QuestTask.TickInterval"/> &gt; 0 的任务）。
+        /// 每帧由 <see cref="NarrativeRunner"/> 用 <c>Time.deltaTime</c> 调用；也可手动调（便于测试）。
+        /// 对应 UE 由 TimerManager 分散驱动的 TickTask，这里集中到宿主一处。
+        /// </summary>
+        public void TickActiveTasks(float deltaSeconds)
+        {
+            if (deltaSeconds <= 0f)
+            {
+                return;
+            }
+
+            // 快照，防 tick 引发 quest 结束/移除时改动列表。
+            var snapshot = new List<Quest>(_questList);
+            foreach (var quest in snapshot)
+            {
+                if (quest != null && quest.IsInProgress)
+                {
+                    quest.TickActiveTasks(deltaSeconds);
+                }
+            }
+        }
+
         private List<Quest> FilterQuests(Func<Quest, bool> predicate)
         {
             var result = new List<Quest>();

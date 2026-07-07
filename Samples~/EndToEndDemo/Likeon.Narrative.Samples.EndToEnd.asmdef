@@ -1,0 +1,16 @@
+{
+  "name": "Likeon.Narrative.Samples.EndToEnd",
+  "rootNamespace": "Likeon.Narrative.Samples",
+  "references": [
+    "Likeon.Narrative.Runtime"
+  ],
+  "includePlatforms": [],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "autoReferenced": true,
+  "defineConstraints": [],
+  "versionDefines": [],
+  "noEngineReferences": false
+}

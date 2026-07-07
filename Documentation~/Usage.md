@@ -251,6 +251,10 @@ start.AddBranch(branch);
 var done = new QuestState("done", EStateNodeType.Success);
 ```
 
+To build the asset object itself in code (procedural quests, samples, tests) instead of in the
+Inspector, use `QuestAsset.Create(questId, startStateId, states)` — and `DataTaskDefinition.Create(taskName)`
+for data tasks.
+
 **Tasks** derive from `QuestTask`: they track progress up to `RequiredQuantity`, can be `Optional`
 (always counts as complete for gating), `Hidden`, and expose `GetDescription()` / `GetProgressText()`
 (e.g. `"1/2"`). The built-in **`CompleteDataTaskQuestTask`** advances by +1 each time a matching
@@ -298,6 +302,29 @@ host.QuestRestarted          += oldInstance => { }; // carries the replaced inst
 > 📌 `ForgetQuest` / `RestartQuest` call `Quest.Deinitialize()`, which ends the current state's tasks
 > so they unsubscribe from the host — a forgotten quest's tasks will **not** keep consuming
 > data-tasks. Always drop quests through the host, not by holding your own reference.
+
+### Polling tasks & `NarrativeRunner`
+
+Most tasks are event-driven — a data-task fires and the task advances, no per-frame work. For tasks
+that must *poll* ("stay in a zone for 3 seconds", "wait until night"), set `TickInterval > 0` and
+override `Tick()`. Something has to drive those ticks: add a **`NarrativeRunner`** component next to
+your `NarrativeComponent` and it calls `host.TickActiveTasks(Time.deltaTime)` each frame for you (or
+call `TickActiveTasks` yourself from your own loop).
+
+```csharp
+public sealed class StayInZoneTask : QuestTask   // TickInterval e.g. 0.25s
+{
+    protected override void OnBeginTask() { /* one-shot "already in zone?" check goes here */ }
+    public override void Tick()
+    {
+        if (PlayerIsInZone(Context.Target)) AddProgress(1); else /* reset */ ;
+    }
+}
+```
+
+Ticks accumulate real time and catch up on long frames, and a task that completes mid-tick can't
+corrupt the others. The first tick is **not** fired automatically on begin — put "check on enter"
+logic in `OnBeginTask`.
 
 ## Saving & loading
 
@@ -383,6 +410,9 @@ event Action<Quest, QuestBranch, QuestTask> QuestTaskCompleted;
 NarrativeSaveData CaptureNarrativeState();
 bool RestoreNarrativeState(NarrativeSaveData data, IEnumerable<QuestAsset> knownQuests);
 bool IsLoading { get; }
+
+// ---- Ticking (polling tasks; usually driven by the NarrativeRunner component) ----
+void TickActiveTasks(float deltaSeconds);
 ```
 
 Dialogue is **not** run through the host in this version — construct a `DialogueController` directly

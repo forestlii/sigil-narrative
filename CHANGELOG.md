@@ -50,4 +50,11 @@ While the public API is unstable it stays in the `0.y.z` range and may break wit
   `RestoreProgress`, and stays silent (`IsLoading`, no `OnQuest*` events fire). `NarrativeSaveManager`
   does JSON + file I/O behind an injectable `IFileSystem` (default `DiskFileSystem`). Note:
   `NarrativeEvent.RefireOnLoad` has no consumer yet — quest states carry no events in this port.
+- `Integration`: `NarrativeComponent.TickActiveTasks(deltaSeconds)` drives polling tasks
+  (`QuestTask.TickInterval > 0`) via `QuestTask.DriveTick` (time accumulator; catches up on large
+  frames; snapshot + `IsActive` guard so a task completing mid-tick can't corrupt iteration), and the
+  thin `NarrativeRunner` MonoBehaviour feeds it `Time.deltaTime` each frame. Code-authoring factories
+  `QuestAsset.Create` and `DataTaskDefinition.Create` for procedural quests / samples / tests.
+  End-to-end EditMode coverage (dialogue event → data-task → quest → save → restore) and an importable
+  **End-to-end demo** sample (`Samples~/EndToEndDemo`).
 - Docs: bilingual README, MIT `LICENSE`, and a bilingual usage guide (`Documentation~/Usage.md`).

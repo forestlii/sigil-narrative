@@ -17,7 +17,8 @@
 > 见[致谢](#致谢)。
 
 > **状态：开发中（`0.x`）。** 本包按里程碑逐步搭建。目前已交付：**Core 数据任务层**、**条件/事件节点模型**、
-> **对话**系统、**任务**状态机、以及**叙事状态存档/读档**（均有 EditMode 测试覆盖）。图编辑器与端到端 demo 是下一步——见路线图。
+> **对话**系统、**任务**状态机、**叙事状态存档/读档**、以及**运行时集成**（任务 tick + 端到端样例）——
+> 均有 EditMode 测试覆盖。核心叙事循环已完整；图编辑器是主要的可选增强。
 > 公开 API 未稳定，可能不经大版本号变更即破坏兼容。
 
 ## 安装
@@ -55,8 +56,10 @@
   `QuestAsset` 模板，以及 `NarrativeComponent` 上的宿主侧管理 / 查询 / 事件。
 - **存档** —— 叙事状态存档/读档：JSON DTO（`NarrativeSaveData`）、宿主上的 `CaptureNarrativeState` /
   `RestoreNarrativeState`，以及带可注入 `IFileSystem` 的 `NarrativeSaveManager`。
+- **集成** —— 轮询任务的 tick 驱动（`NarrativeComponent.TickActiveTasks` + `NarrativeRunner` 组件）、
+  代码构建工厂（`QuestAsset.Create`、`DataTaskDefinition.Create`），以及可导入的**端到端样例**。
 - **宿主** —— `NarrativeComponent`（`MonoBehaviour`，无需继承基类）。
-- 以上全部的 EditMode 测试覆盖（在 6000.4.10f1 上全绿）。
+- 以上全部的 EditMode 测试覆盖（含一条端到端全链路，在 6000.4.10f1 上全绿）。
 
 完整用法见 **[`Documentation~/Usage.zh-CN.md`](Documentation~/Usage.zh-CN.md)**。
 
@@ -69,7 +72,7 @@
 | 对话：图、分块运行器、presenter 接口 | ✅ 完成 |
 | 任务：State / Branch / Task 状态机 + 宿主集成 | ✅ 完成 |
 | 存档：叙事状态的 JSON DTO 存/读 | ✅ 完成 |
-| 集成：端到端 demo | ⏳ 下一步 |
+| 集成：任务 tick + 端到端 demo | ✅ 完成 |
 
 刻意**排除在范围外**（与 Sigil GAS 核心同样的取舍）：战斗、联机/网络同步、AI、角色创建器、
 编辑器内的图编辑器。
