@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Likeon. Licensed under the MIT License.
-// 叙事宿主组件。对应 UE 的 UTalesComponent（挂在 PlayerController 上）。
+// 叙事宿主组件。对应 UE 里挂在 PlayerController 上的叙事宿主组件。
 // 这里做成 MonoBehaviour + 实现 INarrativeHost——不强制用户继承任何基类，加到任意 GameObject 上即可。
 // M1 只覆盖 data-task 面（记录/查询/事件）；对话、任务、存档随后续里程碑扩充。
 
@@ -11,14 +11,14 @@ namespace Likeon.Narrative
 {
     /// <summary>
     /// 叙事系统的宿主组件——开始对话/任务、完成 data-task、查询叙事状态的入口。
-    /// 对应 UE <c>UTalesComponent</c>。加到你的玩家 GameObject 上即可，无需继承基类。
+    /// 对应 UE 的叙事宿主组件。加到你的玩家 GameObject 上即可，无需继承基类。
     /// </summary>
     [AddComponentMenu("Sigil/Narrative/Narrative Component")]
     public class NarrativeComponent : MonoBehaviour, INarrativeHost
     {
         private readonly MasterTaskList _masterTasks = new MasterTaskList();
 
-        // 玩家参与的所有任务（进行中/已成/已败）。对应 UE UTalesComponent::QuestList。
+        // 玩家参与的所有任务（进行中/已成/已败）。对应 UE 叙事宿主组件的 QuestList。
         private readonly List<Quest> _questList = new List<Quest>();
 
         // 每个 quest 实例的事件解绑器，Forget/Restart 时用来断开桥接，避免悬空订阅。
@@ -343,7 +343,7 @@ namespace Likeon.Narrative
         // ==================== 存档 / 读档（叙事状态）====================
         //
         // 只覆盖“路径一：叙事状态” = 任务进度 + 完成过的 data-task。world-actor 通用存档是后续里程碑。
-        // 对应 UE UTalesComponent::PrepareForSave / PerformLoad。
+        // 对应 UE 叙事宿主组件的 PrepareForSave / PerformLoad。
 
         /// <summary>是否正在读档（此间不广播 OnQuest* 事件）。对应 UE bIsLoading。</summary>
         public bool IsLoading => _isLoading;

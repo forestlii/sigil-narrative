@@ -19,8 +19,7 @@
 7. [任务](#任务)
 8. [存档与读档](#存档与读档)
 9. [`NarrativeComponent` 速查表](#narrativecomponent-速查表)
-10. [从 Narrative Pro / UE 迁移过来？](#从-narrative-pro--ue-迁移过来)
-11. [尚未包含的部分](#尚未包含的部分)
+10. [尚未包含的部分](#尚未包含的部分)
 
 ---
 
@@ -437,23 +436,6 @@ void TickActiveTasks(float deltaSeconds);
 
 本版本对话**不**走宿主——直接构造 `DialogueController`（见[对话](#对话)）。宿主侧的对话编排在计划中。
 
-## 从 Narrative Pro / UE 迁移过来？
-
-这是对 Narrative Pro / Narrative Arsenal（Narrative Tools 出品）**设计**的从零 C# 重写。大致对应：
-
-| Narrative Pro (UE) | 本包 | 说明 |
-|---|---|---|
-| `UTalesComponent` | `NarrativeComponent` | 组件而非基类；加到任意 GameObject。 |
-| `UNarrativeDataTask` | `DataTaskDefinition` | `ScriptableObject`；`MakeTaskString` 规范化一致。 |
-| `MasterTaskList`（TMap） | `MasterTaskList` | 同样的 原始串 → 次数 记录。 |
-| `TSubclassOf<UQuest>`（任务身份） | `QuestAsset`（任务身份） | 宿主按资产为键管理任务列表。 |
-| `UQuest` / `UQuestState` / `UQuestBranch` / `UNarrativeTask` | `Quest` / `QuestState` / `QuestBranch` / `QuestTask` | 相同的状态机语义。 |
-| 每次 `BeginQuest` 都 `NewObject<UQuest>` | `QuestAsset.CreateRuntimeQuest`（深克隆） | 每次运行都是新实例；模板不动。 |
-| `UDialogue`（编译后） | `DialogueGraph` + `DialogueController` | 扁平 ID 互引图；无蓝图编译步骤。 |
-| 对话表现代码 | `IDialoguePresenter` | 表现从核心里彻底剥出。 |
-| `UNarrativeCondition` / `UNarrativeEvent` | `NarrativeCondition` / `NarrativeEvent` | `[SerializeReference]` 多态。 |
-| 复制 / GAS / 组队 / 图编辑器 | *（超出范围）* | 仅单机——见下。 |
-
 ## 尚未包含的部分
 
 - **对话/任务的图编辑器**——目前通过 Inspector 编辑扁平模板（大图会比较吃力）。
@@ -464,5 +446,4 @@ void TickActiveTasks(float deltaSeconds);
 
 ---
 
-以 [MIT](../LICENSE.md) 授权。叙事**设计**沿用 Narrative Tools 的 *Narrative Pro / Narrative Arsenal*，
-在 Unity C# 中从零重写；不含任何第三方引擎或源码。
+以 [MIT](../LICENSE.md) 授权。独立、纯字符串，不依赖任何第三方或生态包。

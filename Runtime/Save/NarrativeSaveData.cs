@@ -11,7 +11,7 @@ namespace Likeon.Narrative
     /// <summary>
     /// 一份叙事存档：玩家参与过的任务 + 完成过的 data-task 记录。
     /// 用 <see cref="NarrativeSaveManager"/> 与 JSON 互转；由宿主 Capture/Restore 生成与消费。
-    /// 对应 UE <c>UTalesComponent</c> 存档的 <c>SavedQuests</c> + <c>MasterTaskList</c>。
+    /// 对应 UE 叙事宿主组件存档的 <c>SavedQuests</c> + <c>MasterTaskList</c>。
     /// </summary>
     [Serializable]
     public sealed class NarrativeSaveData

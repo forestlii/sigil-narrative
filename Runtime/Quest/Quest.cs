@@ -1,6 +1,6 @@
 // Copyright (c) 2026 Likeon. Licensed under the MIT License.
 // 任务运行时状态机。对应 UE 的 UQuest：持有状态集，从起始状态推进，任务完成即取分支到目标状态，
-// 到达 Success/Failure 状态则结束。事件对应 UE TalesComponent 的 OnQuest* 委托群。
+// 到达 Success/Failure 状态则结束。事件对应 UE 叙事宿主组件的 OnQuest* 委托群。
 
 using System;
 using System.Collections.Generic;
@@ -55,7 +55,7 @@ namespace Likeon.Narrative
         public bool IsFailed => Completion == EQuestCompletion.Failed;
         public bool IsFinished => IsSucceeded || IsFailed;
 
-        // ---------------- 事件（对应 UE TalesComponent 的 OnQuest* 委托）----------------
+        // ---------------- 事件（对应 UE 叙事宿主组件的 OnQuest* 委托）----------------
 
         public event Action<Quest> Started;
         public event Action<Quest, QuestState> NewState;

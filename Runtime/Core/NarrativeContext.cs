@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Likeon. Licensed under the MIT License.
-// 条件/事件运行时的上下文。对应 UE 里到处传的 (APawn* Target, APlayerController*, UTalesComponent*) 三元组。
+// 条件/事件运行时的上下文。对应 UE 里到处传的 (APawn* Target, APlayerController*, 叙事宿主组件*) 三元组。
 // 单机 + 无角色系统，精简为“宿主 + 可选目标 GameObject”。
 
 using UnityEngine;

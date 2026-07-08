@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Likeon. Licensed under the MIT License.
-// 叙事宿主接口。对应 UE 的 UTalesComponent 对外能力的一个精简契约。
+// 叙事宿主接口。对应 UE 叙事宿主组件对外能力的一个精简契约。
 // 用接口而非基类，条件/事件与运行时逻辑只依赖它，不依赖具体 MonoBehaviour——既解耦又便于测试与替身。
 
 using System;

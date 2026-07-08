@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Likeon. Licensed under the MIT License.
-// 玩家“做过什么”的持久记录。对应 UE UTalesComponent 里的 MasterTaskList（TMap<FString,int32>）。
+// 玩家“做过什么”的持久记录。对应 UE 叙事宿主组件里的 MasterTaskList（TMap<FString,int32>）。
 // 记录每个 data-task 原始串被完成的次数，是任务系统与对话系统的耦合点，也是存档核心之一。
 // 纯 C#（不依赖 UnityEngine），便于 EditMode 单测。见 [[DataTaskDefinition]]。
 
@@ -9,7 +9,7 @@ namespace Likeon.Narrative
 {
     /// <summary>
     /// 已完成 data-task 的累计记录：原始任务串 → 完成次数。
-    /// 对应 UE <c>UTalesComponent::MasterTaskList</c> 以及 CompleteNarrativeDataTask / HasCompletedTask 一族。
+    /// 对应 UE 叙事宿主组件的 MasterTaskList 以及 CompleteNarrativeDataTask / HasCompletedTask 一族。
     /// 任务分支靠它推进；对话条件靠它查询（“是否杀过 King”）；存档时整表序列化。
     /// </summary>
     public sealed class MasterTaskList

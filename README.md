@@ -12,11 +12,6 @@ dependencies**.
 - **Dependencies:** none
 - **Usage:** full guide in [`Documentation~/Usage.md`](Documentation~/Usage.md) (English / 简体中文)
 
-> This reimplements the **design** of *Narrative Pro / Narrative Arsenal* by Narrative Tools —
-> the dialogue graph, quest state machine and data-task model — as an independent C# rewrite for
-> Unity, from scratch. No third-party engine or
-> source code is included. See [Attribution](#attribution).
-
 > **Status: work-in-progress (`0.x`).** Built milestone by milestone. Shipped today: the **Core
 > data-task layer**, the **condition/event node model**, the **dialogue** system, the **quest**
 > state machine, **narrative-state save/load**, and **runtime integration** (task ticking + an
@@ -85,13 +80,6 @@ See **[`Documentation~/Usage.md`](Documentation~/Usage.md)** for the full guide.
 
 Intentionally **out of scope** (mirrors the same cuts as the Sigil GAS core): combat, networking/
 replication, AI, character creator, and in-editor graph editors.
-
-## Attribution
-
-The narrative model (branching dialogue graph, quest state machine, data-tasks) follows the
-**design** of *Narrative Pro / Narrative Arsenal* by **Narrative Tools**, reimplemented from scratch
-in Unity C#. No third-party engine or source code is
-included.
 
 ## License
 

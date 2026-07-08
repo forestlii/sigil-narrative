@@ -19,8 +19,7 @@ model, **dialogue**, and the **quest** state machine, all driven through one hos
 7. [Quests](#quests)
 8. [Saving & loading](#saving--loading)
 9. [`NarrativeComponent` cheat sheet](#narrativecomponent-cheat-sheet)
-10. [Coming from Narrative Pro / UE?](#coming-from-narrative-pro--ue)
-11. [What's not here yet](#whats-not-here-yet)
+10. [What's not here yet](#whats-not-here-yet)
 
 ---
 
@@ -468,24 +467,6 @@ void TickActiveTasks(float deltaSeconds);
 Dialogue is **not** run through the host in this version — construct a `DialogueController` directly
 (see [Dialogue](#dialogue)). Host-side dialogue orchestration is planned.
 
-## Coming from Narrative Pro / UE?
-
-This is a from-scratch C# reimplementation of the **design** of Narrative Pro / Narrative Arsenal
-(by Narrative Tools). Rough mapping:
-
-| Narrative Pro (UE) | This package | Note |
-|---|---|---|
-| `UTalesComponent` | `NarrativeComponent` | Component, not a base class; add to any GameObject. |
-| `UNarrativeDataTask` | `DataTaskDefinition` | `ScriptableObject`; same `MakeTaskString` normalization. |
-| `MasterTaskList` (TMap) | `MasterTaskList` | Same raw-string → count record. |
-| `TSubclassOf<UQuest>` (quest identity) | `QuestAsset` (quest identity) | Host keys the quest list by asset. |
-| `UQuest` / `UQuestState` / `UQuestBranch` / `UNarrativeTask` | `Quest` / `QuestState` / `QuestBranch` / `QuestTask` | Same state-machine semantics. |
-| `NewObject<UQuest>` per `BeginQuest` | `QuestAsset.CreateRuntimeQuest` (deep clone) | Fresh per-run instance; template untouched. |
-| `UDialogue` (compiled) | `DialogueGraph` + `DialogueController` | Flat ID-linked graph; no blueprint compile step. |
-| Dialogue presentation code | `IDialoguePresenter` | Presentation pulled out of the core entirely. |
-| `UNarrativeCondition` / `UNarrativeEvent` | `NarrativeCondition` / `NarrativeEvent` | `[SerializeReference]` polymorphic. |
-| Replication / GAS / party / editor graphs | *(out of scope)* | Single-player only — see below. |
-
 ## What's not here yet
 
 - **In-editor graph editors** for dialogue and quests — author flat templates via the Inspector for
@@ -499,6 +480,5 @@ This is a from-scratch C# reimplementation of the **design** of Narrative Pro / 
 
 ---
 
-Licensed under [MIT](../LICENSE.md). The narrative **design** follows *Narrative Pro / Narrative
-Arsenal* by Narrative Tools, reimplemented from scratch in Unity C#; no third-party engine or source
-code is included.
+Licensed under [MIT](../LICENSE.md). Standalone and string-based, with no third-party or ecosystem
+dependencies.

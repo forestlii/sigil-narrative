@@ -11,10 +11,6 @@
 - **依赖：** 无
 - **使用指南：** 完整用法见 [`Documentation~/Usage.zh-CN.md`](Documentation~/Usage.zh-CN.md)（中 / 英）
 
-> 本项目把 Narrative Tools 的 *Narrative Pro / Narrative Arsenal* 的**设计**（对话图、任务状态机、
-> data-task 模型）以独立 C# 重写到 Unity——从零实现，不含任何第三方引擎或源码。
-> 见[致谢](#致谢)。
-
 > **状态：开发中（`0.x`）。** 本包按里程碑逐步搭建。目前已交付：**Core 数据任务层**、**条件/事件节点模型**、
 > **对话**系统、**任务**状态机、**叙事状态存档/读档**、以及**运行时集成**（任务 tick + 端到端样例）——
 > 均有 EditMode 测试覆盖。核心叙事循环已完整；图编辑器是主要的可选增强。
@@ -74,12 +70,6 @@
 
 刻意**排除在范围外**（与 Sigil GAS 核心同样的取舍）：战斗、联机/网络同步、AI、角色创建器、
 编辑器内的图编辑器。
-
-## 致谢
-
-叙事模型（分支对话图、任务状态机、data-task）借鉴 **Narrative Tools** 的
-*Narrative Pro / Narrative Arsenal* 的**设计**，以 Unity C# 从零重写。
-不含任何第三方引擎或源码。
 
 ## 许可
 
