@@ -140,6 +140,16 @@ var cond = new HasCompletedTaskCondition(killNpc, "King", quantity: 1);
 bool ok = cond.IsMet(host.MakeContext());
 ```
 
+Built-in: **`QuestStateCondition`** — passes when a quest is in a chosen state (`InProgress` /
+`Succeeded` / `Failed` / `Finished` / `StartedOrFinished`). A never-started quest is `false` for
+every query. Combine with `Not` for "unless".
+
+```csharp
+// e.g. only offer this dialogue option after the intro quest succeeded
+var cond = new QuestStateCondition(introQuest, EQuestStateQuery.Succeeded);
+bool ok = cond.IsMet(host.MakeContext());
+```
+
 **Events** — subclass `NarrativeEvent`, override `Execute`. An event runs at a `Runtime` phase
 (`Start` / `End` / `Both`), can carry its own gating `Conditions`, and has `RefireOnLoad` (whether a
 save-load should replay it — set `false` for one-shot grants like "give 500 XP").
@@ -150,6 +160,14 @@ dialogue line or quest node pushes progress into the system:
 ```csharp
 var node = new DialogueNode_NPC("greet", new DialogueLine("Welcome back."));
 node.AddEvent(new CompleteDataTaskEvent(talkTo, "Elder")); // completing "talkto_elder" on reach
+```
+
+Built-in: **`BeginQuestEvent`** — starts a quest on the host (the canonical "talk to NPC → begin
+quest"). It defaults to `RefireOnLoad = false` because starting a quest is a one-shot side effect.
+
+```csharp
+var line = new DialogueNode_NPC("giveQuest", new DialogueLine("Bring me the gemstone."));
+line.AddEvent(new BeginQuestEvent(gemstoneQuest)); // begins the quest when this line plays
 ```
 
 `NarrativeNodeBase.ProcessEvents(context, phase)` filters by phase, checks each event's own
@@ -322,6 +340,19 @@ runtime state). See the **Quest state events & RefireOnLoad** sample.
 
 > Note: `QuestState` also inherits `Conditions`, but state entry is **not** condition-gated in this
 > version — only `Events` are consumed on states.
+
+A **`QuestBranch`** is also a `NarrativeNodeBase`, so branches carry `Events` too. A branch's events
+fire when it **activates** (phase `Start` — when its owning state is entered) and **deactivates**
+(phase `End` — when the branch is taken, or a sibling is taken and the state is left). Same
+`RefireOnLoad` filtering applies on load. Taking a branch fires its End events **exactly once**
+(deactivation is idempotent). Like states, branch `Conditions` are inherited but dormant — branch
+selection stays task-driven.
+
+```csharp
+var branch = new QuestBranch { Id = "toGemstone", DestinationStateId = "hasGem" };
+branch.AddTask(new CompleteDataTaskQuestTask(pickUp, "Gemstone", 1));
+branch.AddEvent(new GrantRewardEvent(gold: 50) { Runtime = EEventRuntime.End }); // when this branch is taken
+```
 
 ### Polling tasks & `NarrativeRunner`
 

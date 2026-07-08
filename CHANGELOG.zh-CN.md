@@ -55,4 +55,15 @@
   `RefireOnLoad`：读档时任务重入存档所处状态，`ProcessEvents(..., isLoading: true)` 会跳过一次性事件
   （`RefireOnLoad == false`）以免重复发奖励，而 `RefireOnLoad == true` 的事件照常重放。新增
   **Quest state events & RefireOnLoad** 样例（`Samples~/QuestStateEvents`）。
+- `Quest` 分支事件：`QuestBranch` 现在也继承 `NarrativeNodeBase`（对齐 UE——`UQuestState` 与
+  `UQuestBranch` 同为 `UQuestNode` 子类）。分支的 `Events` 在激活（`Start` 阶段，所属状态被进入时）
+  与停用（`End` 阶段，分支被取用或兄弟分支被取用时）触发，读档同样按 `RefireOnLoad` 过滤。`Deactivate`
+  改为幂等，取分支时其 End 事件恰好触发一次（修掉移植中潜在的“分支被 Deactivate 两次”隐患）。分支的
+  `Conditions` 继承但休眠（分支取用仍由任务驱动），与 `QuestState` 一致。
+- `INarrativeHost` 扩出最小任务面（`BeginQuest`、`IsQuestInProgress` / `IsQuestSucceeded` /
+  `IsQuestFailed` / `IsQuestFinished` / `IsQuestStartedOrFinished`），让任务相关内置只依赖接口
+  （便于测试替身）。
+- 内置件：`BeginQuestEvent`（在节点进入/离开时开始一个任务——最常见的“和 NPC 对话即开任务”；因开任务
+  是一次性副作用，默认 `RefireOnLoad == false`）与 `QuestStateCondition`（按任务是否
+  进行中/已成功/已失败/已结束/已参与过来门控节点或事件，如“任务 X 完成后才显示此对话选项”）。
 - 文档：双语 README、MIT `LICENSE`、以及双语使用指南（`Documentation~/Usage.md`）。

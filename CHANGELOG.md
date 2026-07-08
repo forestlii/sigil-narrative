@@ -62,4 +62,18 @@ While the public API is unstable it stays in the `0.y.z` range and may break wit
   state, and `ProcessEvents(..., isLoading: true)` skips one-shot events (`RefireOnLoad == false`) so
   rewards aren't re-granted, while `RefireOnLoad == true` events re-run. New **Quest state events &
   RefireOnLoad** sample (`Samples~/QuestStateEvents`).
+- `Quest` branch events: `QuestBranch` now also extends `NarrativeNodeBase` (matching UE, where both
+  `UQuestState` and `UQuestBranch` derive from `UQuestNode`). A branch's `Events` fire on activation
+  (phase `Start`, when its owning state is entered) and deactivation (phase `End`, when the branch is
+  taken or a sibling is), with the same `RefireOnLoad` filtering on load. `Deactivate` is now
+  idempotent, so taking a branch fires its End events exactly once (fixing a latent double-deactivation
+  in the port). Branch `Conditions` are inherited but dormant (branch selection stays task-driven),
+  consistent with `QuestState`.
+- `INarrativeHost` extended with the minimal quest surface (`BeginQuest`, `IsQuestInProgress` /
+  `IsQuestSucceeded` / `IsQuestFailed` / `IsQuestFinished` / `IsQuestStartedOrFinished`) so quest-aware
+  built-ins depend only on the interface (test-double friendly).
+- Built-ins: `BeginQuestEvent` (start a quest on enter/exit of a node — the canonical "talk to NPC →
+  begin quest"; defaults to `RefireOnLoad == false` since starting a quest is a one-shot side effect)
+  and `QuestStateCondition` (gate a node/event on a quest being in-progress/succeeded/failed/finished/
+  started-or-finished, e.g. "show this dialogue option only after quest X is done").
 - Docs: bilingual README, MIT `LICENSE`, and a bilingual usage guide (`Documentation~/Usage.md`).

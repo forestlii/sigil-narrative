@@ -79,6 +79,9 @@ namespace Likeon.Narrative
         // 读档期间为 true：EnterState 触发状态事件时跳过 RefireOnLoad=false 的一次性事件。
         private bool _loading;
 
+        /// <summary>是否正在读档重放（供分支激活/停用时按 <see cref="NarrativeEvent.RefireOnLoad"/> 过滤事件）。</summary>
+        internal bool IsLoading => _loading;
+
         /// <summary>
         /// 开始任务：进入起始状态（或指定的 <paramref name="startFromId"/>）。对应 UE BeginQuest。
         /// </summary>
