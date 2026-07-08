@@ -4,7 +4,6 @@
   "references": [
     "Likeon.Narrative.Runtime",
     "Likeon.Narrative.Editor",
-    "Likeon.GAS.Runtime",
     "UnityEngine.TestRunner",
     "UnityEditor.TestRunner"
   ],

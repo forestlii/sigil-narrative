@@ -27,8 +27,7 @@
 ## 安装
 
 把 `com.likeon.narrative` 文件夹拷进项目的 `Packages/` 目录，或用
-**Package Manager → Add package from disk…** 选中 `package.json`。同时需要用同样方式安装
-[`com.likeon.gas`](https://github.com/forestlii/sigil-gas)——它是唯一依赖（GameplayTag 系统复用自它）。
+**Package Manager → Add package from disk…** 选中 `package.json`。它是独立的——没有其它依赖要装。
 
 当包位于项目文件夹之外时，要跑内置的 EditMode 测试，需在 `Packages/manifest.json` 里把它加进
 `"testables"`，然后打开 **Window → General → Test Runner**：

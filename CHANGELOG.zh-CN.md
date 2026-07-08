@@ -10,7 +10,7 @@
 ## [未发布]
 
 ### 新增
-- 包骨架：`com.likeon.narrative`（依赖 `com.likeon.gas` 复用其 GameplayTag 系统），
+- 包骨架：`com.likeon.narrative`（独立、无依赖），
   `Likeon.Narrative.Runtime` / `.Editor` / `.Tests.EditMode` 程序集定义。
 - `Core`：`DataTaskDefinition`（轻量 `名_参数` 任务标记）与 `MasterTaskList`
   （已完成 data-task 的持久记录；任务与对话的耦合点）。

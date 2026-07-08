@@ -1,9 +1,7 @@
 {
   "name": "Likeon.Narrative.Runtime",
   "rootNamespace": "Likeon.Narrative",
-  "references": [
-    "Likeon.GAS.Runtime"
-  ],
+  "references": [],
   "includePlatforms": [],
   "excludePlatforms": [],
   "allowUnsafeCode": false,

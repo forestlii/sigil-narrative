@@ -10,7 +10,7 @@ While the public API is unstable it stays in the `0.y.z` range and may break wit
 ## [Unreleased]
 
 ### Added
-- Package scaffolding: `com.likeon.narrative` (depends on `com.likeon.gas` for the GameplayTag system),
+- Package scaffolding: `com.likeon.narrative` (standalone, no dependencies),
   `Likeon.Narrative.Runtime` / `.Editor` / `.Tests.EditMode` assembly definitions.
 - `Core`: `DataTaskDefinition` (lightweight `Name_Argument` task marker) and `MasterTaskList`
   (persistent record of completed data-tasks; the coupling point between quests and dialogue).

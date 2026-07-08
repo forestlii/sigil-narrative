@@ -3,13 +3,13 @@
 [English](README.md) | [简体中文](README.zh-CN.md)
 
 A single-player **narrative framework** for Unity: branching **dialogue**, a state-machine
-**quest** system, and **save/load**. Part of the Sigil ecosystem — it reuses the GameplayTag
-system from [`com.likeon.gas`](https://github.com/forestlii/sigil-gas) rather than shipping its own.
+**quest** system, and **save/load**. Standalone and string-based — **no third-party or ecosystem
+dependencies**.
 
 - **Engine:** Unity 6 — developed & verified on 6000.4.10f1
 - **Scope:** single-player logic (no networking, no combat — see roadmap)
 - **Publisher:** Likeon · namespace `Likeon.Narrative`
-- **Depends on:** [`com.likeon.gas`](https://github.com/forestlii/sigil-gas) (GameplayTag system)
+- **Dependencies:** none
 - **Usage:** full guide in [`Documentation~/Usage.md`](Documentation~/Usage.md) (English / 简体中文)
 
 > This reimplements the **design** of *Narrative Pro / Narrative Arsenal* by Narrative Tools —
@@ -27,9 +27,8 @@ system from [`com.likeon.gas`](https://github.com/forestlii/sigil-gas) rather th
 ## Install
 
 Copy the `com.likeon.narrative` folder into your project's `Packages/` directory, or use
-**Package Manager → Add package from disk…** and select `package.json`. You also need
-[`com.likeon.gas`](https://github.com/forestlii/sigil-gas) installed the same way (it is the only
-dependency).
+**Package Manager → Add package from disk…** and select `package.json`. There are no other
+dependencies to install.
 
 ### Running tests
 
@@ -45,7 +44,8 @@ project folder, add it to `"testables"` in your project's `Packages/manifest.jso
 
 - **No forced base class.** Hosting is a `MonoBehaviour` component; saveable objects implement an
   interface (`ISaveable`) — you never inherit a "NarrativeActor".
-- **Reuse, don't reinvent.** GameplayTags come from `com.likeon.gas`.
+- **Standalone & string-based.** Tasks, ids and quest keys are plain strings — no dependency on a tag
+  system or any other package.
 - **Presentation-agnostic.** Dialogue exposes a presenter interface; cinematics/camera/audio are the
   host project's job, not baked into the core.
 - **Testable logic.** State machines and normalization are authored to run under EditMode tests.

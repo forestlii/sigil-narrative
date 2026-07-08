@@ -2,8 +2,7 @@
   "name": "Likeon.Narrative.Editor",
   "rootNamespace": "Likeon.Narrative.Editor",
   "references": [
-    "Likeon.Narrative.Runtime",
-    "Likeon.GAS.Runtime"
+    "Likeon.Narrative.Runtime"
   ],
   "includePlatforms": [
     "Editor"

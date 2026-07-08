@@ -3,13 +3,12 @@
 [English](README.md) | [简体中文](README.zh-CN.md)
 
 面向 Unity 单机游戏的**叙事框架**：分支**对话**、状态机**任务**系统、**存档/读档**。
-属于 Sigil 生态——复用 [`com.likeon.gas`](https://github.com/forestlii/sigil-gas) 的 GameplayTag 系统，
-不自带一套。
+独立、纯字符串——**不依赖任何第三方或生态包**。
 
 - **引擎：** Unity 6 —— 在 6000.4.10f1 上开发与验证
 - **范围：** 单机逻辑（不做联机、不做战斗，见路线图）
 - **发布者：** Likeon · 命名空间 `Likeon.Narrative`
-- **依赖：** [`com.likeon.gas`](https://github.com/forestlii/sigil-gas)（GameplayTag 系统）
+- **依赖：** 无
 - **使用指南：** 完整用法见 [`Documentation~/Usage.zh-CN.md`](Documentation~/Usage.zh-CN.md)（中 / 英）
 
 > 本项目把 Narrative Tools 的 *Narrative Pro / Narrative Arsenal* 的**设计**（对话图、任务状态机、
@@ -24,8 +23,7 @@
 ## 安装
 
 把 `com.likeon.narrative` 文件夹拷进你工程的 `Packages/` 目录，或用
-**Package Manager → Add package from disk…** 选择 `package.json`。你还需要同样方式装上
-[`com.likeon.gas`](https://github.com/forestlii/sigil-gas)（它是唯一依赖）。
+**Package Manager → Add package from disk…** 选择 `package.json`。没有其它依赖要装。
 
 ### 跑测试
 
@@ -40,7 +38,7 @@
 
 - **不强制继承基类。** 宿主是 `MonoBehaviour` 组件；可存档对象实现接口（`ISaveable`）——
   你永远不必去继承一个"NarrativeActor"。
-- **复用，不重造。** GameplayTag 直接用 `com.likeon.gas` 的。
+- **独立、纯字符串。** 任务、ID、任务键都是普通字符串——不依赖标签系统或任何别的包。
 - **与表现层解耦。** 对话暴露一个 presenter 接口；过场/相机/音频是宿主工程的活，不焊死在核心里。
 - **逻辑可测。** 状态机与规范化逻辑按 EditMode 可测来写。
 

@@ -27,9 +27,8 @@ model, **dialogue**, and the **quest** state machine, all driven through one hos
 ## Install
 
 Copy the `com.likeon.narrative` folder into your project's `Packages/` directory, or use
-**Package Manager → Add package from disk…** and pick `package.json`. You also need
-[`com.likeon.gas`](https://github.com/forestlii/sigil-gas) installed the same way — it is the only
-dependency (the GameplayTag system is reused from it).
+**Package Manager → Add package from disk…** and pick `package.json`. It is standalone — there are no
+other dependencies to install.
 
 To run the bundled EditMode tests when the package lives outside your project folder, add it to
 `"testables"` in `Packages/manifest.json`, then open **Window → General → Test Runner**:
