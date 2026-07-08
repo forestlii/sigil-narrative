@@ -303,6 +303,27 @@ host.QuestRestarted          += oldInstance => { }; // carries the replaced inst
 > so they unsubscribe from the host — a forgotten quest's tasks will **not** keep consuming
 > data-tasks. Always drop quests through the host, not by holding your own reference.
 
+### State events (side effects on entering a state)
+
+A `QuestState` is a `NarrativeNodeBase`, so it carries an `Events` list. Its events fire when the
+quest **enters** the state (phase `Start`) and **leaves** it (phase `End`) — including terminal
+`Success` / `Failure` states, so "on success, grant a reward" is just an event on the success state.
+Write one like any [event](#conditions--events-the-node-model) and attach it:
+
+```csharp
+var done = new QuestState("done", EStateNodeType.Success);
+done.AddEvent(new GrantRewardEvent(gold: 100));   // fires when the quest reaches "done"
+```
+
+**`RefireOnLoad`** matters here: loading a save rebuilds the quest at its saved state, which re-enters
+that state and re-runs its entry events. So mark one-shot effects (grant gold, +XP — things already
+persisted in your own save) with `RefireOnLoad = false` so they are **not** re-applied on load; leave
+`RefireOnLoad = true` (the default) for effects that must be re-applied (UI banners, re-registering
+runtime state). See the **Quest state events & RefireOnLoad** sample.
+
+> Note: `QuestState` also inherits `Conditions`, but state entry is **not** condition-gated in this
+> version — only `Events` are consumed on states.
+
 ### Polling tasks & `NarrativeRunner`
 
 Most tasks are event-driven — a data-task fires and the task advances, no per-frame work. For tasks
@@ -366,9 +387,8 @@ string json = NarrativeSaveManager.ToJson(data);
 NarrativeSaveData back = NarrativeSaveManager.FromJson(json);
 ```
 
-> 💡 `NarrativeEvent.RefireOnLoad` exists on the event base but has **no consumer yet** — quest states
-> carry no events in this port, so nothing re-fires on load. It becomes relevant if/when quest-state
-> events are added.
+> 💡 On load, the quest re-enters its saved state, so that state's entry events re-run — except those
+> marked `RefireOnLoad = false` (one-shot grants). See [State events](#state-events-side-effects-on-entering-a-state).
 
 ## `NarrativeComponent` cheat sheet
 
@@ -443,8 +463,6 @@ This is a from-scratch C# reimplementation of the **design** of Narrative Pro / 
 - **General world-object saving** (GUID-keyed, arbitrary components). The shipped save layer covers
   narrative state only (quests + data-tasks); a generic `ISaveable` / `SaveableEntity` path is a
   later milestone.
-- **Quest-state events** — quest states don't carry `NarrativeEvent`s yet, so `RefireOnLoad` is
-  dormant and there are no on-enter-state side effects.
 - **Presentation layer** (cutscenes, camera, avatars), **combat/GAS integration**, **AI**,
   **networking/replication**, **character creator** — intentionally out of scope, mirroring the same
   cuts as the Sigil GAS core.

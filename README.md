@@ -60,7 +60,8 @@ project folder, add it to `"testables"` in your project's `Packages/manifest.jso
 - **Dialogue** — a flat ID-linked `DialogueGraph`, a chunk-based `DialogueController`, and the
   presentation-agnostic `IDialoguePresenter` (`DialogueAsset` to store one as an asset).
 - **Quests** — the `Quest` state machine (`QuestState` / `QuestBranch` / `QuestTask`), `QuestAsset`
-  templates cloned per run, and host-side management / queries / events on `NarrativeComponent`.
+  templates cloned per run, state entry/exit events (`RefireOnLoad`-aware), and host-side management /
+  queries / events on `NarrativeComponent`.
 - **Save** — narrative-state save/load: a JSON DTO (`NarrativeSaveData`), `CaptureNarrativeState` /
   `RestoreNarrativeState` on the host, and `NarrativeSaveManager` with an injectable `IFileSystem`.
 - **Integration** — task ticking for polling tasks (`NarrativeComponent.TickActiveTasks` + the

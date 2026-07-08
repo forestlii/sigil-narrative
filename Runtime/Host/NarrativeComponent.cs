@@ -112,6 +112,12 @@ namespace Likeon.Narrative
         /// <returns>新建的运行时任务实例；失败返回 <c>null</c>。</returns>
         public Quest BeginQuest(QuestAsset quest, string startFromId = null)
         {
+            return BeginQuestInternal(quest, startFromId, false);
+        }
+
+        // loading=true 时走 BeginForLoad：状态进入事件按 RefireOnLoad 过滤（读档路径用）。
+        private Quest BeginQuestInternal(QuestAsset quest, string startFromId, bool loading)
+        {
             if (quest == null)
             {
                 return null;
@@ -126,7 +132,16 @@ namespace Likeon.Narrative
             var instance = quest.CreateRuntimeQuest(MakeContext());
             _questList.Add(instance);
             WireQuest(instance);   // 先桥接再 Begin，让 Started/NewState 也能广播出去
-            instance.Begin(startFromId);
+
+            if (loading)
+            {
+                instance.BeginForLoad(startFromId);
+            }
+            else
+            {
+                instance.Begin(startFromId);
+            }
+
             return instance;
         }
 
@@ -458,8 +473,9 @@ namespace Likeon.Narrative
                             continue;
                         }
 
-                        // 直接从存档所处状态开始（激活该状态的分支/任务，订阅宿主）。
-                        var quest = BeginQuest(asset, savedQuest.currentStateId);
+                        // 直接从存档所处状态开始（激活该状态的分支/任务，订阅宿主）；
+                        // loading=true → 该状态的进入事件按 RefireOnLoad 过滤，一次性事件不重放。
+                        var quest = BeginQuestInternal(asset, savedQuest.currentStateId, true);
                         if (quest == null)
                         {
                             continue;

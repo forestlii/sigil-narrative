@@ -76,10 +76,21 @@ namespace Likeon.Narrative
             return _statesById.TryGetValue(id, out var state) ? state : null;
         }
 
+        // 读档期间为 true：EnterState 触发状态事件时跳过 RefireOnLoad=false 的一次性事件。
+        private bool _loading;
+
         /// <summary>
         /// 开始任务：进入起始状态（或指定的 <paramref name="startFromId"/>）。对应 UE BeginQuest。
         /// </summary>
-        public bool Begin(string startFromId = null)
+        public bool Begin(string startFromId = null) => BeginInternal(startFromId, false);
+
+        /// <summary>
+        /// 读档专用开始：从存档所处状态进入，且该状态的进入事件按 <see cref="NarrativeEvent.RefireOnLoad"/> 过滤
+        /// （一次性事件如“给奖励”不重放）。由宿主读档路径调用。
+        /// </summary>
+        internal bool BeginForLoad(string startFromId) => BeginInternal(startFromId, true);
+
+        private bool BeginInternal(string startFromId, bool loading)
         {
             if (Completion != EQuestCompletion.NotStarted)
             {
@@ -93,8 +104,10 @@ namespace Likeon.Narrative
             }
 
             Completion = EQuestCompletion.Started;
+            _loading = loading;
             Started?.Invoke(this);
             EnterState(start);
+            _loading = false;
             return true;
         }
 
@@ -107,12 +120,19 @@ namespace Likeon.Narrative
                 return;
             }
 
-            // 先停用旧状态（结束其任务），再切到新状态。对应 UE EnterState_Internal。
-            CurrentState?.Deactivate();
+            // 先停用旧状态（结束其任务、触发其“离开”事件），再切到新状态。对应 UE EnterState_Internal。
+            var oldState = CurrentState;
+            oldState?.Deactivate();
+            oldState?.ProcessEvents(_context, EEventRuntime.End, _loading);
+
             CurrentState = newState;
             _reached.Add(newState);
 
             NewState?.Invoke(this, newState);
+
+            // 状态“进入”事件：对所有状态（含 Success/Failure 终止态，如“成功即发奖励”）都触发。
+            // 对应 UE UQuestNode::Activate 里的 ProcessEvents(Start)。
+            newState.ProcessEvents(_context, EEventRuntime.Start, _loading);
 
             // 注：顺序上我们先发 NewState（“已到达此状态”），再发 Succeeded/Failed（“因此任务结束”）——
             // 比 UE 略调整，读起来更符合因果；行为一致。

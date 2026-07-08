@@ -8,15 +8,15 @@ using UnityEngine;
 namespace Likeon.Narrative
 {
     /// <summary>
-    /// 任务状态机里的一个状态。对应 UE <c>UQuestState</c>。
-    /// <see cref="NodeType"/> 决定到达此状态时任务是进行中/成功/失败。
+    /// 任务状态机里的一个状态。对应 UE <c>UQuestState</c>（继承 <c>UNarrativeNodeBase</c>）。
+    /// <see cref="NodeType"/> 决定到达此状态时任务是进行中/成功/失败；
+    /// 继承自 <see cref="NarrativeNodeBase"/> 的 <see cref="NarrativeNodeBase.Events"/> 在到达/离开此状态时触发
+    /// （进入发 Start、离开发 End，见 <see cref="Quest.EnterState"/>），可用于“到达即给奖励/开对话”等状态副作用。
+    /// 注：继承而来的 <see cref="NarrativeNodeBase.Conditions"/> 目前不参与状态流转判定（进入目标状态不做条件门控）。
     /// </summary>
     [Serializable]
-    public sealed class QuestState
+    public sealed class QuestState : NarrativeNodeBase
     {
-        [Tooltip("状态 ID（分支的目标、存档定位都用它）。")]
-        [SerializeField] private string id;
-
         [Tooltip("状态类型：Regular/Success/Failure。对应 UE StateNodeType。")]
         [SerializeField] private EStateNodeType nodeType = EStateNodeType.Regular;
 
@@ -27,14 +27,8 @@ namespace Likeon.Narrative
 
         public QuestState(string id, EStateNodeType nodeType = EStateNodeType.Regular)
         {
-            this.id = id;
+            Id = id;
             this.nodeType = nodeType;
-        }
-
-        public string Id
-        {
-            get => id ?? string.Empty;
-            set => id = value;
         }
 
         public EStateNodeType NodeType => nodeType;

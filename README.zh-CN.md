@@ -53,7 +53,7 @@
 - **对话** —— 扁平、按 ID 互引的 `DialogueGraph`，分块推进的 `DialogueController`，
   以及与表现解耦的 `IDialoguePresenter`（可用 `DialogueAsset` 存成资产）。
 - **任务** —— `Quest` 状态机（`QuestState` / `QuestBranch` / `QuestTask`）、每次运行克隆的
-  `QuestAsset` 模板，以及 `NarrativeComponent` 上的宿主侧管理 / 查询 / 事件。
+  `QuestAsset` 模板、状态进入/离开事件（支持 `RefireOnLoad`），以及 `NarrativeComponent` 上的宿主侧管理 / 查询 / 事件。
 - **存档** —— 叙事状态存档/读档：JSON DTO（`NarrativeSaveData`）、宿主上的 `CaptureNarrativeState` /
   `RestoreNarrativeState`，以及带可注入 `IFileSystem` 的 `NarrativeSaveManager`。
 - **集成** —— 轮询任务的 tick 驱动（`NarrativeComponent.TickActiveTasks` + `NarrativeRunner` 组件）、

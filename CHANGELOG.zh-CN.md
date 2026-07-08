@@ -43,12 +43,16 @@
   `NarrativeComponent.CaptureNarrativeState` / `RestoreNarrativeState(data, knownQuests)` 对应
   UE `PrepareForSave` / `PerformLoad`——读档把每个任务重建到存档所处状态、用不广播的 `RestoreProgress`
   回填进度，全程静默（`IsLoading`，不触发任何 `OnQuest*` 事件）。`NarrativeSaveManager` 负责 JSON + 文件读写，
-  文件层走可注入的 `IFileSystem`（默认 `DiskFileSystem`）。注：`NarrativeEvent.RefireOnLoad` 暂无消费者
-  ——本移植的任务状态不携带事件。
+  文件层走可注入的 `IFileSystem`（默认 `DiskFileSystem`）。
 - `Integration`：`NarrativeComponent.TickActiveTasks(deltaSeconds)` 通过 `QuestTask.DriveTick`
   驱动轮询任务（`QuestTask.TickInterval > 0`）——时间累积、大帧补 tick、快照 + `IsActive` 守卫
   （某次 tick 中途完成任务也不会破坏迭代）；薄壳 `NarrativeRunner` MonoBehaviour 每帧喂 `Time.deltaTime`。
   代码构建工厂 `QuestAsset.Create` 与 `DataTaskDefinition.Create`（程序化任务 / 样例 / 测试用）。
   端到端 EditMode 覆盖（对话事件 → data-task → 任务 → 存档 → 读档）+ 可导入的**端到端样例**
   （`Samples~/EndToEndDemo`）。
+- `Quest` 状态事件：`QuestState` 现继承 `NarrativeNodeBase`，其 `Events` 在进入（阶段 `Start`）与离开
+  （阶段 `End`）状态时触发——含 `Success` / `Failure` 终止态（如“成功即发奖励”）。这也激活了
+  `RefireOnLoad`：读档时任务重入存档所处状态，`ProcessEvents(..., isLoading: true)` 会跳过一次性事件
+  （`RefireOnLoad == false`）以免重复发奖励，而 `RefireOnLoad == true` 的事件照常重放。新增
+  **Quest state events & RefireOnLoad** 样例（`Samples~/QuestStateEvents`）。
 - 文档：双语 README、MIT `LICENSE`、以及双语使用指南（`Documentation~/Usage.md`）。

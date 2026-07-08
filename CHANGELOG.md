@@ -48,8 +48,7 @@ While the public API is unstable it stays in the `0.y.z` range and may break wit
   `RestoreNarrativeState(data, knownQuests)` mirror UE `PrepareForSave` / `PerformLoad` — restore
   rebuilds each quest at its saved state, refills task progress via the non-broadcasting
   `RestoreProgress`, and stays silent (`IsLoading`, no `OnQuest*` events fire). `NarrativeSaveManager`
-  does JSON + file I/O behind an injectable `IFileSystem` (default `DiskFileSystem`). Note:
-  `NarrativeEvent.RefireOnLoad` has no consumer yet — quest states carry no events in this port.
+  does JSON + file I/O behind an injectable `IFileSystem` (default `DiskFileSystem`).
 - `Integration`: `NarrativeComponent.TickActiveTasks(deltaSeconds)` drives polling tasks
   (`QuestTask.TickInterval > 0`) via `QuestTask.DriveTick` (time accumulator; catches up on large
   frames; snapshot + `IsActive` guard so a task completing mid-tick can't corrupt iteration), and the
@@ -57,4 +56,10 @@ While the public API is unstable it stays in the `0.y.z` range and may break wit
   `QuestAsset.Create` and `DataTaskDefinition.Create` for procedural quests / samples / tests.
   End-to-end EditMode coverage (dialogue event → data-task → quest → save → restore) and an importable
   **End-to-end demo** sample (`Samples~/EndToEndDemo`).
+- `Quest` state events: `QuestState` now extends `NarrativeNodeBase`, so its `Events` fire on entering
+  (phase `Start`) and leaving (phase `End`) a state — including terminal `Success` / `Failure` states
+  (e.g. grant a reward on success). This activates `RefireOnLoad`: on load a quest re-enters its saved
+  state, and `ProcessEvents(..., isLoading: true)` skips one-shot events (`RefireOnLoad == false`) so
+  rewards aren't re-granted, while `RefireOnLoad == true` events re-run. New **Quest state events &
+  RefireOnLoad** sample (`Samples~/QuestStateEvents`).
 - Docs: bilingual README, MIT `LICENSE`, and a bilingual usage guide (`Documentation~/Usage.md`).

@@ -82,7 +82,11 @@ namespace Likeon.Narrative
         /// 处理本节点在给定阶段（Start/End）该触发的事件：先按阶段过滤，再检查事件自身前置条件，最后执行。
         /// 对应 UE <c>ProcessEvents(..., EEventRuntime)</c>。
         /// </summary>
-        public void ProcessEvents(NarrativeContext context, EEventRuntime phase)
+        /// <param name="isLoading">
+        /// 是否处于读档重放：为 true 时跳过 <see cref="NarrativeEvent.RefireOnLoad"/> 为 false 的一次性事件
+        /// （如“给 500 XP”），避免读档重复发放。对应 UE 的 bRefireOnLoad 语义。
+        /// </param>
+        public void ProcessEvents(NarrativeContext context, EEventRuntime phase, bool isLoading = false)
         {
             if (events == null)
             {
@@ -92,6 +96,12 @@ namespace Likeon.Narrative
             foreach (var narrativeEvent in events)
             {
                 if (narrativeEvent == null || !narrativeEvent.RunsAt(phase))
+                {
+                    continue;
+                }
+
+                // 读档重放：非 RefireOnLoad 的一次性事件在读档时跳过。
+                if (isLoading && !narrativeEvent.RefireOnLoad)
                 {
                     continue;
                 }

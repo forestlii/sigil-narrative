@@ -25,6 +25,11 @@
       "displayName": "End-to-end demo",
       "description": "One script: begin quest → play dialogue → event completes a data-task → quest succeeds → save → restore.",
       "path": "Samples~/EndToEndDemo"
+    },
+    {
+      "displayName": "Quest state events & RefireOnLoad",
+      "description": "Attach events to quest states (grant reward / show banner on entry) and see how RefireOnLoad behaves on load.",
+      "path": "Samples~/QuestStateEvents"
     }
   ]
 }
